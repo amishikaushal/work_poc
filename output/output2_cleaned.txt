@@ -1,22 +1,44 @@
-=== UNIVERSAL MEDICAL SUMMARY ===
-[PROVIDER] : Dr. Niraj Patil
-[PATIENT]  : Mr. Keerthi Ajay Kumar
-[AGE/SEX]  : 34Yr 11M
+=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
 
-========================================
-CLEANED CLINICAL DATA
-========================================
-
-[DIAGNOSIS]
-1) Throat and tongue such as UPPP, Transpalatal Advancement
-
+APOLLO HOSPITALS
+Plot No: 1, Swaminarayan Nagar,
+New Adgaon Naka, Panchavati,
+Near Lunge Mangal Karyalay,
+Nashik, Maharashtra — 422003
+Ph: +91 8069991046
+Dept of ENT
+Patient Details
+[UHID]
+ APC200002356545 Name : Mr. Keerthi Ajay Kumar
+[Patient Identifier]
+ APC2LP56985 Age : 34Yr 11Mth 2Days
+Sex Male Date of 
+[Admission]
+ : 01° February 2024
+Date of 
+[Discharge]
+ 02” February 2024 Address : H.No: 7-1-163
+Maruthi Veedhi,Chapal bai
+Secunderabad — 500003.
+Ward/Bed No Third Floor General Primary Consultant _ : Dr. Niraj Patil and
+Ward Bed No FGW 14 ENT Team
+Surgeons Dr. ENT Team,
+ENT.
+[Diagnosis]
+[Diagnosis]
+ 1) Throat and tongue such as UPPP, Transpalatal Advancement
 Pharyngoplasty, TORS, hypoglossal nerve stimulation, tongue
 reduction, and partial epiglottidectomy.
-
-[PROCEDURE]
+[Surgery]
+/
+[Procedure]
 s Done
-
-[PROCEDURE]
-Name Date
-
+[Surgery]
+/
+[Procedure]
+[Surgery]
+/
+[Procedure]
+ Name Date
 01 February 2023
+, +91 -44- 28290956

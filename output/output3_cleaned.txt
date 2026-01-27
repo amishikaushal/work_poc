@@ -1,40 +1,33 @@
-=== UNIVERSAL MEDICAL SUMMARY ===
-[PROVIDER] : DR DARSHAN SINGH BHAKUNI E
-[PATIENT]  : Ms RUKHSANA SHAHEEN
-[AGE/SEX]  : 56 yrs/Female
+=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
 
-========================================
-CLEANED CLINICAL DATA
-========================================
-
-[CONSULTANT NOTES]
-:
+Human Care Medical Charitable Trust
+Registered Office : Sector-6,Dwarka, New Dethi- 110075
+DEPARTMENT OF RHEUMATOLOGY
+Name : Ms RUKHSANA SHAHEEN 
+[Hospital No]
+ : MHOO5990453
+Age / Sex : 56 yrs/Female Episode No : 030000528270
+Doctor : DR DARSHAN SINGH BHAKUNI Episode Date =<: 02/07/2021 08:31AM
+Department : RHEUMATOLOGY MHD
+OUTPATIENT SUMMARY
+[Consultant Notes]
+ :
 Video consultation done
 Known case of systemic lupus erythematosus and scleroderma overlap with interstitial
-
 lung disease on medication.
-
 Present problem
 tightness of skin of the fists and ulcers on the pulp of the fingers
-
-[TREATMENT ADVISED]
+[Treatment advised]
 Tablet Linezolid 600 mg twice a day for 5 Days as advised in detail in case the ulcers
 of the fingers do not heal.
-
 Tablet Clopidogrel 75 mg once a day after meals
-
 Tablet Amlodipine 5 mg once a day
-
 Tab Domperidone 10 mg twice a day before meals
-
 Cap Omeprazole 20 Mg Twice a Day before Meal
-
 Tablet Bosentan 62.5 mg twice a day after meals
-
 Tab Sildinafil Citrate 0.5 mg twice a day after meals
 Tablet Prednisolone 5 mag once a day after breakfast
 Tablet Mycophenolate mofetil 500 ma 2 tablets twice a day
 Tablet L-methylfolate calcium 400 pa 1 tablet once a day
 Tablet ciprofloxacin 250 mg twice a day
-
 Review after 4 weeks

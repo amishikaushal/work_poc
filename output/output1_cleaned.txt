@@ -1,37 +1,28 @@
-=== UNIVERSAL MEDICAL SUMMARY ===
-[PROVIDER] : Dr. Manish Sharma
-[PATIENT]  : Mr. Siddharth Rana Male
-[AGE/SEX]  : 28 yr
-[WEIGHT]   : 105 Kg
+=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
 
-========================================
-CLEANED CLINICAL DATA
-========================================
-
-[SYMPTOMS]
+Dr. Manish Sharma
+MBBS, PGDMH
+(General Physician, Registration Number:HN 012425)
+Sector-12, Chandigarh PIN- 160012, India.
+Patient Details
+Name: Gender:
+Mr. Siddharth Rana Male
+Address Age
+P 28 yr
+BS
+[Symptoms]
 • right side headache - 3 Days
-
-Primary
-
-[DIAGNOSIS]
+Primary 
+[Diagnosis]
 Headache, unspecified
-
-[PRESCRIPTION]
+[Prescription]
 • NAXDOM 500 TABLET 15 UNIT- [After Food]
-
 Domperidone+Naproxen
-
 As advised for 5 Days
-
 Note: for headache
-
 • PANTOP D SR CAPSULE 10 UNIT- [Before Food]
 Once a day(Morning) for 5 Days
-
 • Nurokind Gold RF Tablet 10's- [After Food]
-
 • visit
-
 Weight:
-
 105 Kg
