@@ -1,0 +1,40 @@
+=== UNIVERSAL MEDICAL SUMMARY ===
+[PROVIDER] : DR DARSHAN SINGH BHAKUNI E
+[PATIENT]  : Ms RUKHSANA SHAHEEN
+[AGE/SEX]  : 56 yrs/Female
+
+========================================
+CLEANED CLINICAL DATA
+========================================
+
+[CONSULTANT NOTES]
+:
+Video consultation done
+Known case of systemic lupus erythematosus and scleroderma overlap with interstitial
+
+lung disease on medication.
+
+Present problem
+tightness of skin of the fists and ulcers on the pulp of the fingers
+
+[TREATMENT ADVISED]
+Tablet Linezolid 600 mg twice a day for 5 Days as advised in detail in case the ulcers
+of the fingers do not heal.
+
+Tablet Clopidogrel 75 mg once a day after meals
+
+Tablet Amlodipine 5 mg once a day
+
+Tab Domperidone 10 mg twice a day before meals
+
+Cap Omeprazole 20 Mg Twice a Day before Meal
+
+Tablet Bosentan 62.5 mg twice a day after meals
+
+Tab Sildinafil Citrate 0.5 mg twice a day after meals
+Tablet Prednisolone 5 mag once a day after breakfast
+Tablet Mycophenolate mofetil 500 ma 2 tablets twice a day
+Tablet L-methylfolate calcium 400 pa 1 tablet once a day
+Tablet ciprofloxacin 250 mg twice a day
+
+Review after 4 weeks

@@ -1,0 +1,22 @@
+=== UNIVERSAL MEDICAL SUMMARY ===
+[PROVIDER] : Dr. Niraj Patil
+[PATIENT]  : Mr. Keerthi Ajay Kumar
+[AGE/SEX]  : 34Yr 11M
+
+========================================
+CLEANED CLINICAL DATA
+========================================
+
+[DIAGNOSIS]
+1) Throat and tongue such as UPPP, Transpalatal Advancement
+
+Pharyngoplasty, TORS, hypoglossal nerve stimulation, tongue
+reduction, and partial epiglottidectomy.
+
+[PROCEDURE]
+s Done
+
+[PROCEDURE]
+Name Date
+
+01 February 2023
