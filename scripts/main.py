@@ -35,8 +35,8 @@ def run_pipeline(input_pdf):
 
 if __name__ == "__main__":
     # Settings for your folder structure
-    INPUT_FILE = "input/input1.pdf" 
-    OUTPUT_FILE = "output/output1_cleaned.txt"
+    INPUT_FILE = "input/input5.pdf" 
+    OUTPUT_FILE = "output/output5_cleaned.txt"
     
     if not os.path.exists("output"):
         os.makedirs("output")
