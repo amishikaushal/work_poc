@@ -1,0 +1,29 @@
+=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
+
+EN MEDICAL PRESCRIPTION
+SAINT-PIERRE GENERAL HOSPITAL
+Internal Medicine Department
+12 Rue de la Santé, Paris, France
+Name of Doctor: Dr. Jean Dupont
+Registration number: FR-MED-458921
+Patient Name: Mr. Paul Martin
+Age: 34 years old
+Gender: Male
+[UHID]: UHID-987654
+[Diagnosis]
+Acute bronchitis with moderate fever
+[Symptoms]
+• Persistent cough for 5 days
+• Mild fever
+“General fatigue
+[Prescription]
+• Amoxicillin 500 mg — twice daily for 7 days
+• Paracetamol 650 mg — if fever or pain
+• Cough syrup — 10 ml twice a day
+Tips
+• Drink plenty of fluids
+“Complete rest for 5 days
+“Return for a follow-up consultation if symptoms persist
+Date: September 12, 2025
+Signature of the Doctor:
+Dr. Jean Dupont
