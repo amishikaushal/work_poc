@@ -1,0 +1,12 @@
+# OCR and PDF Processing
+pdf2image
+pytesseract
+Pillow
+
+# Language and Translation
+langdetect
+deep-translator
+requests
+
+# Text Processing
+# (re is a built-in library, no need to list it here)
