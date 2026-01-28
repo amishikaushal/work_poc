@@ -7,6 +7,3 @@ Pillow
 langdetect
 deep-translator
 requests
-
-# Text Processing
-# (re is a built-in library, no need to list it here)
