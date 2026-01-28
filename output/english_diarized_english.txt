@@ -1,0 +1,8 @@
+Doctor: Hello, what brings you in today?
+Patient: I've been having a headache and fever since yesterday.
+Doctor: Do you have any other symptoms like cough or cold?
+Patient: Yes, a mild cough and body pain.
+Doctor: Have you taken any medicine so far?
+Patient: I just took paracetamol last night.
+Doctor: Okay, it looks like a viral infection. I'll prescribe rest, fluids and medication.
+Patient: Alright doctor, thank you.
