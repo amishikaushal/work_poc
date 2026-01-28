@@ -1,0 +1,30 @@
+=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
+
+Health Clinic
+Department of General Medicine
+Av. Siempreviva 742, Madrid, 742, Madrid, Spain
+Patient Report:
+Date of Birth: Date of May 1990 Age: 35 years
+NT? History: HIS-LAGA-035
+Acute streptococcal pharyngitis with tonsillitis.
+[Symptoms]
+[Diagnostic]
+• Severe throat pain when swallowing.
+• Fever of 38.5°C.
+• Swollen lymph nodes in the neck.
+Plates whactes in the amsisalas.
+• Fatigue.
+[Prescription]
+• Voice rest and carbohydrate fluids.
+[Prescription]
+• Amoxicillin-Clavalluliuc Acid 875/125 mg - one tablet
+Ibuprofen 400 mg - every 6 hours for fever/dlays.
+• Ibuprofen 400 mg - every 6 hours for fever/pain.
+• Avoid cold beds, cold activities and irritating foods.
+Social isolation for 48 hours-incio antibiotics.
+[Next Appointment]
+• Review in 10 days or sooner if you have emperata symptoms.
+Date: January 28, 2026
+Physician's Signature:
+Dr. Ana Pérez
+Collegiate No.: ES-MP-98665

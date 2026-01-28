@@ -1,55 +1,56 @@
 import re
-from googletrans import Translator
-from langdetect import detect
 
-def clean_medical_report(raw_text):
-    # 1. LANGUAGE DETECTION
-    try:
-        source_lang = detect(raw_text)
-    except:
-        source_lang = "en"
-
-    # 2. TRANSLATION PIVOT
-    if source_lang != 'en':
-        try:
-            translator = Translator()
-            text = translator.translate(raw_text, dest='en').text
-        except:
-            text = raw_text
-    else:
-        text = raw_text
-
-    # 3. UNIVERSAL HEADER MAPPING
-    # This ensures that even if translation is slightly off, we force the English label
-    header_map = {
-        r"INFORME DE ALTA MEDICA|RESUME DE SORTIE MEDICALE": "DISCHARGE SUMMARY",
-        r"DATOS DEL PACIENTE|DETAILS DU PATIENT": "PATIENT DETAILS",
-        r"DIAGNOSTICO|DIAGNOSTIC": "DIAGNOSIS",
-        r"TRATAMIENTO RECOMENDADO|TRAITEMENT CONSEILLE": "RECOMMENDED TREATMENT",
-        r"NOMBRE|NOM": "NAME",
-        r"MEDICO|MEDECIN": "PHYSICIAN",
-        r"SEDE SOCIAL|HEADQUARTERS|SIEGE SOCIAL": "ADMIN_NOISE" 
-    }
-
-    # Apply the mapping to standardize the text soup
-    for pattern, replacement in header_map.items():
-        text = re.sub(pattern, f"\n[{replacement}]\n", text, flags=re.I)
-
-    # 4. SURGICAL NOISE REMOVAL (Lossless)
-    # Now we can target the standardized [ADMIN_NOISE] tag
+def clean_medical_report(text):
+    # 1. NOISE REMOVAL
     noise_patterns = [
-        r"\[ADMIN_NOISE\].*", # Removes the Madrid/Paris headquarters line
-        r"The following table:",
-        r"\""
+        r"Regd\. Office:.*", r"Corporate Identity.*",
+        r"Tel:? \+[\d\s-]+", r"Fax:? \+[\d\s-]+",
+        r"The following table:", r"\""
     ]
-    
     cleaned_soup = text
     for pattern in noise_patterns:
-        cleaned_soup = re.sub(pattern, "", cleaned_soup, flags=re.I)
+        cleaned_soup = re.sub(pattern, "", cleaned_soup, flags=re.IGNORECASE)
 
-    # 5. FINAL SEMANTIC CLEANUP
-    # Standardize all brackets and remove excessive spacing
-    final_output = re.sub(r"\n\s*\n", "\n", cleaned_soup).strip()
-    final_output = re.sub(r"[|®¢©*]", "•", final_output)
+    # 2. OCR CORRECTION
+    corrections = {
+        r"Simdmas": "Symptoms", r"fibere": "fever",
+        r"antibotics": "antibiotics", r"Ibuprof\b": "Ibuprofen",
+        r"Amoxicline": "Amoxicillin", r"ho3": "hours"
+    }
+    for pattern, replacement in corrections.items():
+        cleaned_soup = re.sub(pattern, replacement, cleaned_soup, flags=re.IGNORECASE)
 
-    return f"=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===\n[DETECTED LANGUAGE]: {source_lang.upper()}\n\n{final_output}"
+    # 3. SEMANTIC HIGHLIGHTING
+    headers = [
+        "Diagnosis", "Diagnostic", "Symptoms", "Prescription", 
+        "Treatment", "Next Appointment", "UHID", "History"
+    ]
+
+    for header in headers:
+        # We use ^ to ensure it only marks headers at the START of a line
+        # This prevents bracketing the word "symptoms" inside a sentence.
+        cleaned_soup = re.sub(
+            rf"^\s*({header})\b", 
+            r"[\1]", 
+            cleaned_soup, 
+            flags=re.IGNORECASE | re.MULTILINE
+        )
+
+    # 4. FINAL CLEANUP
+    # Standardize bullets
+    final_output = re.sub(r"[|®¢©*»+]", "•", cleaned_soup)
+    # Fix the "e" bullet
+    final_output = re.sub(r"^\s*e\s+", "• ", final_output, flags=re.MULTILINE)
+    
+    # IMPORTANT: Remove any accidental double brackets caused by re-running
+    final_output = final_output.replace("[[", "[").replace("]]", "]")
+    
+    # Remove excessive blank lines
+    final_output = re.sub(r"\n\s*\n", "\n", final_output).strip()
+
+    output = [
+        "=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===",
+        "",
+        final_output
+    ]
+    return "\n".join(output)
