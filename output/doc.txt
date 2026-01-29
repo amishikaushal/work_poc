@@ -1,0 +1,7 @@
+### 1. CLINICAL DOCTOR SUMMARY
+- **Patient Demographics:** Mr. Keerthi Ajay Kumar, 34-year-old male. UHID: APC200002356545.
+- **Hospitalization Dates:** Admitted 01st February 2024, Discharged 02nd February 2024.
+- **Consulting Physicians:** Dr. Niraj Patil and ENT Team.
+- **Primary Concern/Indication for Intervention:** The provided "Diagnosis" section outlines potential surgical interventions for a condition affecting the throat and tongue. These include Uvulopalatopharyngoplasty (UPPP), Transpalatal Advancement Pharyngoplasty, Transoral Robotic Surgery (TORS), hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy.
+- **Procedures Performed:** The specific surgical procedure performed during this admission is not explicitly detailed in the provided documentation. A date of 01st February 2023 is noted under "Surgery/Procedure Name Date," which is inconsistent with the current admission and discharge dates of 2024.
+- **Post-Discharge Plan:** Not specified in the provided summary.

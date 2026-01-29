@@ -1,0 +1,16 @@
+Patient: Hello doctor.
+Doctor: How are you doing?
+Patient: I am feeling very ill.
+Doctor: Did you take any medicines?
+Patient: Did you?
+Patient: I haven't taken any.
+Doctor: Okay, I'm prescribing you Paracetamol.
+Doctor: You should take it thrice a day.
+Patient: Thank you.
+Patient: I guess I need to make out a bit more.
+Patient: 
+Patient: Thank you.
+Patient: 
+Doctor: Thanks for watching!
+Patient: Thanks for watching!
+Doctor: Thank you for watching.

@@ -59,16 +59,11 @@ def save_audio_output(
     # Create the output directory if it does not already exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Extract the base name of the input audio/video file (without extension)
-    base_name = os.path.splitext(os.path.basename(input_file))[0]
+    # Create the final output file path (Fixed to transcript.txt)
+    # Using 'output_dir' which should be pointing to your main output folder
+    output_path = os.path.join(output_dir, "transcript.txt")
 
-    # Create the final output file path
-    output_path = os.path.join(
-        output_dir,
-        base_name + "_diarized_english.txt"
-    )
-
-    # Write the final diarized transcript to a text file
+    # Write the final diarized transcript to the fixed text file
     # Speaker IDs are replaced with inferred roles (Doctor / Patient)
     with open(output_path, "w", encoding="utf-8") as f:
         for seg in segments:
@@ -76,4 +71,4 @@ def save_audio_output(
             f.write(f"{role}: {seg['text']}\n")
 
     # Print confirmation message after saving the output
-    print(f"✅ Output saved at {output_path}")
+    print(f"✅ Final audio transcript saved at: {os.path.abspath(output_path)}")
