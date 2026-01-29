@@ -9,7 +9,7 @@ def process_pdf(input_pdf: str):
     from PIL import Image
     from pdf2image import convert_from_path
 
-    from scripts.translate_utils import detect_language, translate_to_english
+    from scripts.translate_utils import detect_language, translate_text 
     from scripts.preprocess import clean_medical_report
 
     # Path to Tesseract OCR engine (Windows)
@@ -127,7 +127,7 @@ def main():
         return
 
     if not os.path.exists(input_file):
-        print("❌ File not found.")
+        print(" File not found.")
         return
 
     if input_file.lower().endswith(".pdf"):
@@ -137,7 +137,7 @@ def main():
         process_audio(input_file)
 
     else:
-        print("❌ Unsupported file type.")
+        print(" Unsupported file type.")
 
 
 # ---------------- ENTRY POINT ---------------- #
