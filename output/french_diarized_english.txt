@@ -1,0 +1,7 @@
+Patient: Hello.
+Patient: 
+Doctor: Hello.
+Doctor: What is the problem today?
+Patient: I have a fever and I have been coughing for three days.
+Doctor: Okay?
+Doctor: Do you have any other symptoms?

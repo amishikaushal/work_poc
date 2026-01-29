@@ -1,0 +1,9 @@
+torch
+torchaudio
+nemo_toolkit[asr]
+openai-whisper
+pydub
+soundfile
+librosa
+noisereduce
+sounddevice

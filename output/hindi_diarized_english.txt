@@ -1,0 +1,10 @@
+Doctor: Namaste, what is your problem?
+Patient: I have a headache and fever since yesterday.
+Doctor: or cough or cold.
+Patient: Yes, I have slight cough and body pain.
+Doctor: Thank you for watching this video.
+Patient: 
+Doctor: I have taken medicine.
+Patient: Yes, I had taken paracetamol last night.
+Doctor: It's okay, it's going viral. Take rest and take your medicines.
+Patient: No, I am not a doctor.
