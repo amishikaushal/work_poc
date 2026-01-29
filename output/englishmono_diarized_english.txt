@@ -1,0 +1,21 @@
+Doctor: Good morning, please have a seat.
+Doctor: Can you please tell me your name and age?
+Patient: Good morning doctor, my name is Rahul Sharma, I am 52 years old.
+Doctor: Thank you Mr. Sharma. What brings you in today?
+Patient: I have been experiencing chest pain for the past two days.
+Doctor: Can you describe the paint? Is it sharp, dull or light pressure?
+Patient: It feels more like pressure, especially when I walk or exert myself.
+Doctor: On a scale of 1 to 10, how severe is this pain?
+Patient: I would say around seven when I'm walking.
+Doctor: Do experience shortness of breath along with the pain.
+Patient: Yes, especially when climbing stairs or walking fast.
+Doctor: Have you noticed any sweating, dizziness or nausea?
+Patient: I felt slightly dizzy yesterday but no nausea.
+Doctor: Do you have any existing medical conditions such as diabetes or high blood pressure?
+Patient: high blood pressure.
+Patient: and I.
+Doctor: Is there any family history of heart disease?
+Patient: Yes, my father had a heart attack when he was 50.
+Doctor: Thank you for sharing that. Given your symptoms and family history, I recommend an ECG and blood test today.
+Patient: Okay doctor, thank you for explaining everything.
+Doctor: welcome. We will proceed with these tests and discuss the results afterwards.

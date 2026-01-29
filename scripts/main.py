@@ -106,7 +106,25 @@ def process_audio(input_file: str):
 # ---------------- MAIN ROUTER ---------------- #
 
 def main():
-    input_file = input("Enter input file path (PDF / audio / video): ").strip()
+    choice = input(
+        "Choose input type:\n"
+        "1. Upload audio/video/PDF file\n"
+        "2. Record audio from microphone\n"
+        "Enter 1 or 2: "
+    ).strip()
+
+    if choice == "2":
+        from scripts.audio.mic_recorder import record_audio
+        input_file = record_audio()
+
+    elif choice == "1":
+        input_file = input(
+            "Enter input file path (PDF / audio / video): "
+        ).strip()
+
+    else:
+        print("❌ Invalid choice.")
+        return
 
     if not os.path.exists(input_file):
         print("❌ File not found.")
