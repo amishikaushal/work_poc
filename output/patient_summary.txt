@@ -3,21 +3,25 @@
 **Name:** Mr. Keerthi Ajay Kumar  
 **Age:** 34 years, 11 months, 2 days  
 **Gender:** Male  
-**Admission Date:** 01 February 2024  
-**Discharge Date:** 02 February 2024  
-**Hospital:** Apollo Hospitals, Nashik  
+**Hospital:** Apollo Hospitals, Nashik, Maharashtra  
 **Department:** ENT (Ear, Nose, and Throat)  
-**Primary Consultant:** Dr. Niraj Patil and ENT Team  
+**Consultant:** Dr. Niraj Patil and ENT Team  
 
 **Diagnosis:**  
-- Throat and tongue issues requiring surgical intervention.  
+- Throat and tongue-related issues, including considerations for surgical options such as UPPP (Upper Airway Resistance Syndrome), Transpalatal Advancement, Pharyngoplasty, TORS (Transoral Robotic Surgery), hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy.
 
 **Surgery/Procedure Performed:**  
-- **Procedure Name:** Throat and tongue surgery (specific details include UPPP, Transpalatal Advancement, Pharyngoplasty, TORS, hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy).  
-- **Date of Surgery:** 01 February 2024  
+- **Procedure Name:** (Specific procedure name not mentioned in the provided text)  
+- **Date:** 01st February 2023  
 
-**Ward/Bed No:** Third Floor General Ward, Bed No. FGW 14  
+**Admission and Discharge Dates:**  
+- **Admitted on:** 01st February 2024  
+- **Discharged on:** 02nd February 2024  
 
-**Contact Information:**  
-- Apollo Hospitals, Nashik: +91 8069991046  
-- Patient Address: H.No: 7-1-163, Maruthi Veedhi, Chapal Bai, Secunderabad - 500003.
+**Address:**  
+H.No: 7-1-163, Maruthi Veedhi, Chapal Bai, Secunderabad - 500003.  
+
+**Ward Details:**  
+- **Ward/Bed No:** Third Floor General, Bed No. FGW 14  
+
+**Note:** The specific surgical procedure performed during the admission in February 2024 is not detailed in the provided text.

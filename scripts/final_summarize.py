@@ -301,7 +301,7 @@ if __name__ == "__main__":
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
-    # ✅ Read input from the standardized transcript file
+    #  Read input from the standardized transcript file
     if os.path.exists(INPUT_PATH):
         with open(INPUT_PATH, "r", encoding="utf-8") as f:
             input_text = f.read()
@@ -314,7 +314,7 @@ if __name__ == "__main__":
         print("Generating Doctor Perspective...")
         doctor_summary = run_summarization(input_text, "Doctor")
 
-        # 4. ✅ Write each perspective to its own file in the 'output' folder
+        # 4.  Write each perspective to its own file in the 'output' folder
         pat_out = os.path.join(output_dir, "patient_summary.txt")
         doc_out = os.path.join(output_dir, "doctor_summary.txt")
 
@@ -324,7 +324,7 @@ if __name__ == "__main__":
         with open(doc_out, "w", encoding="utf-8") as f:
             f.write(doctor_summary)
 
-        print(f"✅ Success! Summaries written to:\n - {pat_out}\n - {doc_out}")
+        print(f" Success! Summaries written to:\n - {pat_out}\n - {doc_out}")
         
     else:
-        print(f"❌ Error: transcript.txt not found at {INPUT_PATH}")
+        print(f" Error: transcript.txt not found at {INPUT_PATH}")
