@@ -1,31 +1,3 @@
  **Patient Perspective Summary:**
 
-**Name:** Mr. Keerthi Ajay Kumar  
-**Age:** 34 years, 11 months, 2 days  
-**Gender:** Male  
-**Hospital:** Apollo Hospitals, Nashik, Maharashtra  
-**Department:** ENT (Ear, Nose, and Throat)  
-**Consultant:** Dr. Niraj Patil and ENT Team  
-
-**Diagnosis:**  
-Mr. Kumar was diagnosed with a throat and tongue disorder, which may involve conditions like Upper Airway Resistance (UPPP). Potential treatments discussed included Transpalatal Advancement, Pharyngoplasty, TORS (Transoral Robotic Surgery), hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy.
-
-**Surgery/Procedure Performed:**  
-- **Procedure Name:** (Specific procedure name not mentioned in the provided text)  
-- **Date:** 1st February 2023  
-
-**Admission and Discharge Dates:**  
-- **Admitted on:** 1st February 2024  
-- **Discharged on:** 2nd February 2024  
-
-**Ward Details:**  
-- **Ward/Bed No:** Third Floor General, Bed No. FGW 14  
-
-**Contact Information:**  
-- **Hospital Address:** Plot No. 1, Swaminarayan Nagar, New Adgaon Naka, Panchavati, Nashik, Maharashtra - 422003.  
-- **Hospital Phone:** +91 8069991046  
-
-**Additional Information:**  
-- **Patient Address:** H.No: 7-1-163, Maruthi Veedhi, Chapal Bai, Secunderabad - 500003.  
-
-This summary provides a concise overview of Mr. Kumar's medical consultation and treatment at Apollo Hospitals.
+The patient reported feeling unwell for two days with symptoms including fever, headache, body pain, fatigue, mild cough, and sore throat. They had taken paracetamol the previous night. The doctor diagnosed a likely viral infection and prescribed medication, advising rest and hydration. The patient was told to expect improvement within 3-4 days and to return if the fever persisted or worsened.

@@ -7,4 +7,5 @@ soundfile
 librosa
 noisereduce
 sounddevice
+faster-whisper
 

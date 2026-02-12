@@ -1,12 +1,3 @@
- **Doctor's Perspective Summary:**
+ **Doctor's Summary:**
 
-Patient: Mr. Keerthi Ajay Kumar (34Y, 11M, 2D), Male  
-**Hospital:** Apollo Hospitals, Nashik  
-**Department:** ENT  
-**Admission Date:** 01-Feb-2024  
-**Discharge Date:** 02-Feb-2024  
-**Primary Consultant:** Dr. Niraj Patil (ENT)  
-
-**Diagnosis:**  Throat and tongue disorders, including considerations for UPPP (Obstructive Sleep Apnea), Transpalatal Advancement Pharyngoplasty (TAP), TORS (Transoral Robotic Surgery), hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy.  
-
-**Procedure Performed:**  (Note: Date seems inconsistent - listed as "01“ February 2023" - likely a typo; should be 2024)
+The patient presented with a two-day history of fever, headache, body pain, fatigue, mild cough, and sore throat.  Temperature reading confirmed a mild fever.  The patient had taken paracetamol the previous night.  The symptoms suggest a viral infection.  Prescribed appropriate medication, advised rest and hydration, and instructed to return if fever persists or worsens.  Prognosis: Expected recovery within 3-4 days.

@@ -28,9 +28,14 @@
 
 
 import os
+import logging
+import time
 import sounddevice as sd
 import soundfile as sf
 import numpy as np
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def record_audio(
     output_file="recorded_audio.wav",
@@ -41,11 +46,13 @@ def record_audio(
     Records audio from the system microphone and saves it as a WAV file.
     Returns the absolute path to the saved file.
     """
+    start_time = time.time()
     # Ensure the directory exists
     output_dir = os.path.dirname(os.path.abspath(output_file))
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    logger.info(f"Starting audio recording for {duration} seconds")
     print(f"🎙️ Recording for {duration} seconds... Speak now.")
 
     try:
@@ -62,7 +69,9 @@ def record_audio(
         # Save the file
         sf.write(output_file, audio, sample_rate)
         
+        elapsed = time.time() - start_time
         abs_path = os.path.abspath(output_file)
+        logger.info(f"Recording saved in {elapsed:.2f}s: {abs_path}")
         print(f"✅ Recording saved as {abs_path}")
         return abs_path
 
