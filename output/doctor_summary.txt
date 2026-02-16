@@ -1,12 +1,12 @@
- **Doctor's Perspective Summary:**
+**Résumé du point de vue du médecin :**
 
-Patient: Mr. Keerthi Ajay Kumar (34Y, 11M, 2D), Male  
-**Hospital:** Apollo Hospitals, Nashik  
-**Department:** ENT  
-**Admission Date:** 01-Feb-2024  
-**Discharge Date:** 02-Feb-2024  
-**Primary Consultant:** Dr. Niraj Patil (ENT)  
+Patient : M. Keerthi Ajay Kumar (34 ans, 11 mois, 2D), homme  
+**Hôpital :** Hôpitaux Apollo, Nashik  
+**Département :** ORL  
+**Date d'admission :** 01 février 2024  
+**Date de sortie :** 02 février 2024  
+**Consultant principal :** Dr Niraj Patil (ORL)  
 
-**Diagnosis:**  Throat and tongue disorders, including considerations for UPPP (Obstructive Sleep Apnea), Transpalatal Advancement Pharyngoplasty (TAP), TORS (Transoral Robotic Surgery), hypoglossal nerve stimulation, tongue reduction, and partial epiglottidectomy.  
+**Diagnostic :** Troubles de la gorge et de la langue, y compris des considérations sur l'UPPP (apnée obstructive du sommeil), la pharyngoplastie d'avancement transpalatine (TAP), la TORS (chirurgie robotique transorale), la stimulation du nerf hypoglosse, la réduction de la langue et l'épiglottidectomie partielle.  
 
-**Procedure Performed:**  (Note: Date seems inconsistent - listed as "01“ February 2023" - likely a typo; should be 2024)
+**Procédure effectuée :** (Remarque : la date semble incohérente - répertoriée comme "01" février 2023" - probablement une faute de frappe ; devrait être 2024)
