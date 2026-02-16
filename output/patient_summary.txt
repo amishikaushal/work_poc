@@ -1,28 +1,3 @@
-**Résumé du point de vue du patient :**
+ **Patient Perspective Summary:**
 
-**Nom :** M. Keerthi Ajay Kumar  
-**Âge :** 34 ans, 11 mois, 2 jours  
-**Sexe :** Homme  
-**Hôpital :** Hôpitaux Apollo, Nashik, Maharashtra  
-**Département :** ORL (oreille, nez et gorge)  
-**Consultant :** Dr Niraj Patil et équipe ORL  
-
-**Diagnostic :**  
-- Troubles de la gorge et de la langue nécessitant une intervention chirurgicale.  
-- Conditions considérées : UPPP (syndrome de résistance des voies respiratoires supérieures), avancement transpalatin, pharyngoplastie, TORS (chirurgie robotique transorale), stimulation du nerf hypoglosse, réduction de la langue et épiglottidectomie partielle.  
-
-**Chirurgie/procédure effectuée :**  
-- **Nom de la procédure :** (Procédure spécifique non mentionnée dans le texte fourni)  
-- **Date :** 1er février 2024  
-
-**Dates d'admission et de sortie :**  
-- Admis le : 1er février 2024  
-- Libéré le : 2 février 2024  
-
-**Détails du quartier :**  
-- Numéro de salle/lit : Général du troisième étage, lit n° FGW 14  
-
-**Adresse :**  
-H.No : 7-1-163, Maruthi Veedhi, Chapal Bai, Secunderabad - 500003.  
-
-Ce résumé fournit un aperçu concis de la consultation médicale et du traitement du patient dans les hôpitaux Apollo. Pour plus de détails, veuillez vous référer au dossier médical complet.
+The patient visited the doctor complaining of a headache and fever that started the previous day. They also reported a mild cough and body pain. They had taken paracetamol the night before. The doctor diagnosed a likely viral infection and advised rest, fluids, and prescribed medication. The patient thanked the doctor.

@@ -1,4 +1,28 @@
+import logging
+import time
 from nemo.collections.asr.models import SortformerEncLabelModel
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Load model once at module level
+_diar_model = None
+_model_load_time = None
+
+def _get_diarization_model():
+    global _diar_model, _model_load_time
+    if _diar_model is None:
+        logger.info("Loading diarization model: nvidia/diar_streaming_sortformer_4spk-v2.1")
+        model_start = time.time()
+        _diar_model = SortformerEncLabelModel.from_pretrained(
+            "nvidia/diar_streaming_sortformer_4spk-v2.1"
+        )
+        _diar_model.eval()
+        _model_load_time = time.time() - model_start
+        logger.info(f"Diarization model loaded in {_model_load_time:.2f}s")
+    else:
+        logger.info("Using cached diarization model")
+    return _diar_model
 
 def diarize_audio(wav_file: str) -> list[dict]:
     """
@@ -6,15 +30,11 @@ def diarize_audio(wav_file: str) -> list[dict]:
     Identifies who spoke when and assigns speaker labels.
     Returns a list of dictionaries containing start time, end time, and speaker ID.
     """
+    start_time = time.time()
+    logger.info(f"Starting diarization for: {wav_file}")
 
-    # Load the pre-trained NVIDIA NeMo Sortformer diarization model
-    # This model is optimized for streaming and multi-speaker scenarios
-    diar_model = SortformerEncLabelModel.from_pretrained(
-        "nvidia/diar_streaming_sortformer_4spk-v2.1"
-    )
-
-    # Set the model to evaluation mode (no training)
-    diar_model.eval()
+    # Get the cached diarization model
+    diar_model = _get_diarization_model()
 
     # Configure streaming-related parameters for diarization
     # chunk_len: size of audio chunks processed at a time
@@ -30,6 +50,7 @@ def diarize_audio(wav_file: str) -> list[dict]:
     diar_model.sortformer_modules.spkcache_update_period = 300
 
     # Perform speaker diarization on the input WAV file
+    logger.info("Running diarization inference...")
     predicted_segments = diar_model.diarize(
         audio=[wav_file],
         batch_size=1
@@ -47,5 +68,7 @@ def diarize_audio(wav_file: str) -> list[dict]:
             "speaker": speaker        # Speaker identifier (e.g., speaker_0)
         })
 
+    elapsed = time.time() - start_time
+    logger.info(f"Diarization completed in {elapsed:.2f}s. Found {len(diarized_segments)} segments.")
     # Return the list of diarized speaker segments
     return diarized_segments

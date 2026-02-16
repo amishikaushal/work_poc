@@ -1,10 +1,17 @@
+import logging
+import time
 from collections import defaultdict
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def infer_roles(segments: list[dict]) -> dict:
     """
     Infers Doctor / Patient roles based on spoken content.
     Returns a dictionary mapping speaker IDs to their roles.
     """
+    start_time = time.time()
+    logger.info(f"Starting role inference for {len(segments)} segments")
 
     # Dictionary to collect all spoken text for each speaker
     # Example: {"speaker_0": "text...", "speaker_1": "text..."}
@@ -38,5 +45,7 @@ def infer_roles(segments: list[dict]) -> dict:
     for spk in scores:
         role_map[spk] = "Doctor" if spk == doctor_speaker else "Patient"
 
+    elapsed = time.time() - start_time
+    logger.info(f"Role inference completed in {elapsed:.2f}s. Doctor: {doctor_speaker}, Total speakers: {len(role_map)}")
     # Return the final mapping of speaker IDs to roles
     return role_map

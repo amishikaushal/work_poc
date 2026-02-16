@@ -1,12 +1,3 @@
-**Résumé du point de vue du médecin :**
+ **Doctor's Perspective Summary:**
 
-Patient : M. Keerthi Ajay Kumar (34 ans, 11 mois, 2D), homme  
-**Hôpital :** Hôpitaux Apollo, Nashik  
-**Département :** ORL  
-**Date d'admission :** 01 février 2024  
-**Date de sortie :** 02 février 2024  
-**Consultant principal :** Dr Niraj Patil (ORL)  
-
-**Diagnostic :** Troubles de la gorge et de la langue, y compris des considérations sur l'UPPP (apnée obstructive du sommeil), la pharyngoplastie d'avancement transpalatine (TAP), la TORS (chirurgie robotique transorale), la stimulation du nerf hypoglosse, la réduction de la langue et l'épiglottidectomie partielle.  
-
-**Procédure effectuée :** (Remarque : la date semble incohérente - répertoriée comme "01" février 2023" - probablement une faute de frappe ; devrait être 2024)
+Patient presents with headache, fever, mild cough, and body pain since yesterday.  Reports taking paracetamol last night.  Likely viral infection.  Advised rest, fluids, and medication.
