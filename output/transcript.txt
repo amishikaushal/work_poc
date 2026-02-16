@@ -1,26 +1,8 @@
-Patient: Good morning.
-Doctor: Good morning, please come in. What seems to be the problem?
-Patient: Good morning, Doctor. I have been feeling unwell for the past two days.
-Doctor: What symptoms are you experiencing?
-Patient: I have a fever, a headache and a body pain and I also feel very tired.
-Doctor: Do you have a cough or sore throat?
-Patient: Yes, I have a mild cough and like sore throat.
-Patient: Thanks for watching!
-Doctor: Okay, let's.
-Patient: Let me check your temperature.
-Doctor: 
-Doctor: You have a mild fever. Have you taken any medicine?
-Patient: Thank you.
-Patient: I took a paracetamol tablet yesterday night.
-Doctor: That's fine. It looks like a viral infection. I will prescribe some medicines. Make sure you rest well and drink plenty of fluids.
-Patient: Thanks for watching!
-Patient: about an infection.
-Patient: Ok doctor, how many days will it take to recover?
-Doctor: You should feel better in 3-4 days. If the fever continues or gets worse, come back immediately.
-Patient: effective in three.
-Patient: 
-Patient: 
-Patient: I'll be right back immediately.
-Patient: 
-Patient: Thank you, Doctor.
-Doctor: Take care.
+Doctor: Hello, what brings you in today?
+Patient: I've been having a headache and fever since yesterday.
+Doctor: Do you have any other symptoms like cough or cold?
+Patient: Yes, a mild cough and body pain.
+Doctor: Have you taken any medicine so far?
+Patient: I just took paracetamol last night.
+Doctor: Okay, it looks like a viral infection. I'll prescribe rest, fluids and medication.
+Patient: Alright doctor, thank you.

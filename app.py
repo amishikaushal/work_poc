@@ -1,121 +1,44 @@
-# import streamlit as st
-# import os
-# import sys
-
-# # Add the current directory to sys.path so we can import from 'scripts'
-# sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
-# # Import your backend functions
-# from scripts.main import process_pdf, process_audio
-
-# # --- UI Configuration ---
-# st.set_page_config(page_title="Medical AI Scribe", page_icon="⚕️", layout="wide")
-
-# st.title("⚕️ Medical Consultation AI Assistant")
-# st.markdown("Extract insights from medical reports or consultation recordings instantly.")
-
-# # --- Sidebar: Settings ---
-# with st.sidebar:
-#     st.header("Settings")
-#     # Mapping UI names to backend language codes
-#     lang_map = {
-#         "Hindi": "hi",
-#         "Marathi": "mr",
-#         "Gujarati": "gu",
-#         "English": "en",
-#         "Spanish": "es"
-#     }
-#     selected_lang = st.selectbox("Preferred Output Language", list(lang_map.keys()))
-#     target_lang_code = lang_map[selected_lang]
-#     st.info(f"Summary will be generated in: **{selected_lang}**")
-
-# # --- Layout: Input Columns ---
-# col1, col2 = st.columns(2)
-
-# with col1:
-#     st.subheader("📄 Medical Documents")
-#     uploaded_pdf = st.file_uploader("Upload Patient Report (PDF)", type=["pdf"])
-
-# with col2:
-#     st.subheader("🎤 Consultation Audio")
-#     uploaded_audio = st.file_uploader("Upload Recording (WAV/MP3/M4A)", type=["wav", "mp3", "m4a"])
-
-# # --- Processing Logic ---
-# st.divider()
-
-# if st.button("✨ Generate AI Analysis", use_container_width=True):
-#     if not uploaded_pdf and not uploaded_audio:
-#         st.warning("Please upload a file to proceed.")
-#     else:
-#         with st.status("AI is processing... Please wait.", expanded=True) as status:
-#             try:
-#                 # 1. Handle PDF Processing
-#                 if uploaded_pdf:
-#                     st.write("Processing PDF with OCR...")
-#                     temp_path = "temp_input.pdf"
-#                     with open(temp_path, "wb") as f:
-#                         f.write(uploaded_pdf.getbuffer())
-                    
-#                     # Call backend
-#                     patient_res, doctor_res = process_pdf(temp_path, target_lang_code)
-
-#                 # 2. Handle Audio Processing
-#                 elif uploaded_audio:
-#                     st.write("Processing Audio (Diarization & Transcription)...")
-#                     # Save with correct extension
-#                     ext = os.path.splitext(uploaded_audio.name)[1]
-#                     temp_path = f"temp_audio{ext}"
-#                     with open(temp_path, "wb") as f:
-#                         f.write(uploaded_audio.getbuffer())
-                    
-#                     # Call backend
-#                     patient_res, doctor_res = process_audio(temp_path, target_lang_code)
-
-#                 status.update(label="Analysis Complete!", state="complete", expanded=False)
-
-#                 # --- Display Results ---
-#                 st.success("Summaries generated successfully!")
-#                 tab1, tab2 = st.tabs(["👤 Patient Action Plan", "🩺 Clinical Doctor Summary"])
-                
-#                 with tab1:
-#                     st.markdown(f"### {selected_lang} Patient Summary")
-#                     st.info(patient_res)
-#                     st.download_button("Download Patient Plan", patient_res, file_name="patient_plan.txt")
-
-#                 with tab2:
-#                     st.markdown(f"### {selected_lang} Medical Summary")
-#                     st.code(doctor_res, language="markdown")
-#                     st.download_button("Download Doctor Summary", doctor_res, file_name="doctor_summary.txt")
-
-#                 # Cleanup temp files
-#                 if os.path.exists(temp_path):
-#                     os.remove(temp_path)
-
-#             except Exception as e:
-#                 st.error(f"Error during processing: {e}")
-
-
-
-
 import streamlit as st
 import os
-import sys
+from dotenv import load_dotenv
 
-# Connect to your backend
+# ==============================
+# Load Environment Variables
+# ==============================
+load_dotenv()
+
+if not os.getenv("OPENAI_API_KEY"):
+    st.error("🚨 OPENAI_API_KEY not found. Please add it to your .env file.")
+    st.stop()
+
+# Backend
 from scripts.main import process_pdf, process_audio
 from scripts.audio.mic_recorder import record_audio
 
-# --- Page Configuration ---
+# RAG Imports
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.chat_models import ChatOllama
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+from langchain.schema import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+
+# ==============================
+# Page Config
+# ==============================
 st.set_page_config(
-    page_title="Medical AI Scribe", 
-    page_icon="⚕️", 
+    page_title="Medical AI Scribe",
+    page_icon="⚕️",
     layout="wide"
 )
 
-# --- Custom Styling ---
+# ==============================
+# Custom Styling (From Code 2)
+# ==============================
 st.markdown("""
     <style>
-    /* Force the main header to be massive and override Streamlit defaults */
     .main-header { 
         font-size: 3.5rem !important;
         color: #007bff !important; 
@@ -125,19 +48,18 @@ st.markdown("""
         margin-bottom: 0px !important; 
         line-height: 1.2 !important;
         text-shadow: 3px 3px 6px rgba(0,0,0,0.1) !important;
-        display: block !important;
     }
-    
     .sub-header { 
         text-align: center !important; 
         color: #6c757d !important; 
         font-size: 1.8rem !important; 
         margin-bottom: 3rem !important; 
-        font-weight: 400 !important;
     }
-    
-    .stButton>button { border-radius: 8px; font-weight: 600; height: 3em; }
-    
+    .stButton>button { 
+        border-radius: 8px; 
+        font-weight: 600; 
+        height: 3em; 
+    }
     .input-card { 
         padding: 20px; 
         border: 1px solid #e6e9ef;
@@ -148,38 +70,95 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+
+# ==============================
+# Build Dynamic RAG
+# ==============================
+def build_rag_from_summaries(patient_text, doctor_text):
+
+    documents = [
+        Document(page_content=patient_text),
+        Document(page_content=doctor_text)
+    ]
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=800,
+        chunk_overlap=150
+    )
+
+    docs = splitter.split_documents(documents)
+
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    vectorstore = FAISS.from_documents(docs, embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+    llm = ChatOllama(
+        model="llama3",
+        temperature=0
+    )
+
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True
+    )
+
+    qa_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        memory=memory
+    )
+
+    return qa_chain
+
+
+# ==============================
+# MAIN APP
+# ==============================
 def main():
-    # Use a div container to ensure the class is applied correctly
+
     st.markdown('<div class="main-header">⚕️ Healthcare AI Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Automated Medical Scribe & Report Analyzer</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Automated Medical Scribe & Intelligent Medical Chatbot</div>', unsafe_allow_html=True)
 
-    # --- Initialize Session State (The "Memory") ---
-    if "final_audio_path" not in st.session_state:
-        st.session_state.final_audio_path = None
-    if "patient_res" not in st.session_state:
-        st.session_state.patient_res = None
-    if "doctor_res" not in st.session_state:
-        st.session_state.doctor_res = None
+    # Session Defaults
+    defaults = {
+        "final_audio_path": None,
+        "patient_res": None,
+        "doctor_res": None,
+        "qa_chain": None,
+        "chat_messages": []
+    }
 
-    # --- Sidebar: Global Settings ---
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+    # ==============================
+    # Sidebar
+    # ==============================
     with st.sidebar:
         st.header("⚙️ Settings")
+
         lang_map = {
             "English": "en",
-            "French": "fr", 
+            "French": "fr",
             "Spanish": "es",
         }
+
         selected_lang = st.selectbox("Preferred Output Language", list(lang_map.keys()))
         target_lang_code = lang_map[selected_lang]
+
         st.divider()
-        
-        if st.sidebar.button("🗑️ Clear Current Session"):
-            st.session_state.final_audio_path = None
-            st.session_state.patient_res = None
-            st.session_state.doctor_res = None
+
+        if st.button("🗑️ Clear Full Session"):
+            st.session_state.clear()
             st.rerun()
 
-    # --- Main Input Section ---
+    # ==============================
+    # Input Section
+    # ==============================
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
@@ -191,83 +170,142 @@ def main():
     with col2:
         st.markdown('<div class="input-card">', unsafe_allow_html=True)
         st.subheader("🎤 Consultation Audio")
+
         audio_choice = st.radio("Select Source:", ["Upload File", "Record Live"], horizontal=True)
-        
+
         if audio_choice == "Upload File":
             uploaded_audio = st.file_uploader("Upload WAV/MP3/M4A", type=["wav", "mp3", "m4a"])
             if uploaded_audio:
-                st.session_state.final_audio_path = f"temp_{uploaded_audio.name}"
-                with open(st.session_state.final_audio_path, "wb") as f:
+                temp_audio = f"temp_{uploaded_audio.name}"
+                with open(temp_audio, "wb") as f:
                     f.write(uploaded_audio.getbuffer())
-                st.audio(st.session_state.final_audio_path)
-        
+                st.session_state.final_audio_path = temp_audio
+                st.audio(temp_audio)
+
         else:
             duration = st.slider("Record Duration (sec)", 5, 120, 30)
             if st.button("🎙️ Start Recording"):
-                with st.status("Recording... Please speak clearly."):
-                    st.session_state.final_audio_path = record_audio(output_file="live_consultation.wav", duration=duration)
-                
+                with st.status("Recording..."):
+                    st.session_state.final_audio_path = record_audio(
+                        output_file="live_consultation.wav",
+                        duration=duration
+                    )
+
             if st.session_state.final_audio_path and os.path.exists(st.session_state.final_audio_path):
-                st.success("✅ Recording captured and ready!")
+                st.success("Recording ready!")
                 st.audio(st.session_state.final_audio_path)
+
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Processing Action ---
+    # ==============================
+    # Generate AI Analysis
+    # ==============================
     st.divider()
-    
-    # Generate Button
+
     if st.button("✨ Generate AI Analysis", use_container_width=True, type="primary"):
+
         if not uploaded_pdf and not st.session_state.final_audio_path:
-            st.warning("⚠️ Please provide a PDF or Audio input first.")
+            st.warning("Please provide PDF or Audio.")
         else:
-            with st.status("🛠️ Analyzing Medical Content...", expanded=True) as status:
+            with st.status("Processing...", expanded=True):
                 try:
+                    st.session_state.qa_chain = None
+                    st.session_state.chat_messages = []
+
                     if uploaded_pdf:
                         temp_pdf = "process_input.pdf"
-                        with open(temp_pdf, "wb") as f: 
+                        with open(temp_pdf, "wb") as f:
                             f.write(uploaded_pdf.getbuffer())
-                        # Store results in Session State
-                        st.session_state.patient_res, st.session_state.doctor_res = process_pdf(temp_pdf, target_lang_code)
+
+                        st.session_state.patient_res, st.session_state.doctor_res = process_pdf(
+                            temp_pdf,
+                            target_lang_code
+                        )
+
                     else:
-                        # Store results in Session State
-                        st.session_state.patient_res, st.session_state.doctor_res = process_audio(st.session_state.final_audio_path, target_lang_code)
+                        st.session_state.patient_res, st.session_state.doctor_res = process_audio(
+                            st.session_state.final_audio_path,
+                            target_lang_code
+                        )
 
-                    status.update(label="✅ Success!", state="complete", expanded=False)
-                
+                    # Build RAG
+                    st.session_state.qa_chain = build_rag_from_summaries(
+                        st.session_state.patient_res,
+                        st.session_state.doctor_res
+                    )
+
+                    st.success("Analysis Complete & Chatbot Ready!")
+
                 except Exception as e:
-                    st.error(f"Error: {e}")
+                    st.error(f"Processing Error: {e}")
 
-    # --- RESULTS DISPLAY AREA ---
+    # ==============================
+    # Results Display
+    # ==============================
     if st.session_state.patient_res and st.session_state.doctor_res:
+
         st.markdown("### 📊 Analysis Results")
+
         tab1, tab2 = st.tabs(["👤 Patient Action Plan", "🩺 Doctor Summary"])
-        
+
         with tab1:
-            st.markdown(f"#### {selected_lang} Patient Instructions")
-            # Patient Plan already has blue padding from st.info
             st.info(st.session_state.patient_res)
             st.download_button(
-                label="📩 Download Patient Plan", 
-                data=st.session_state.patient_res, 
-                file_name=f"patient_plan_{target_lang_code}.txt",
-                key="btn_pat_dl"
+                "📩 Download Patient Plan",
+                st.session_state.patient_res,
+                file_name=f"patient_plan_{target_lang_code}.txt"
             )
-            
+
         with tab2:
-            st.markdown(f"#### {selected_lang} Clinical Summary")
-            # Custom styled div for Doctor Summary to match the padding look
             st.markdown(f"""
-                        <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff; color: #1f2937;"> 
-                            {st.session_state.doctor_res}
-                        </div>
-                        """, unsafe_allow_html=True)
-            st.write("") # Small spacer
+                <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff;">
+                    {st.session_state.doctor_res}
+                </div>
+            """, unsafe_allow_html=True)
+
             st.download_button(
-                label="📂 Download Clinical Data", 
-                data=st.session_state.doctor_res, 
-                file_name=f"doctor_summary_{target_lang_code}.txt",
-                key="btn_doc_dl"
+                "📂 Download Doctor Summary",
+                st.session_state.doctor_res,
+                file_name=f"doctor_summary_{target_lang_code}.txt"
             )
+
+    # ==============================
+    # RAG CHATBOT
+    # ==============================
+    st.divider()
+    st.header("🏥 Medical Knowledge Chatbot")
+
+    if st.session_state.qa_chain is None:
+        st.info("Generate AI Analysis first to activate chatbot.")
+        return
+
+    qa_chain = st.session_state.qa_chain
+
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("Ask a question about this case..."):
+
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        st.session_state.chat_messages.append({
+            "role": "user",
+            "content": prompt
+        })
+
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing..."):
+                result = qa_chain({"question": prompt})
+                response = result["answer"]
+                st.markdown(response)
+
+        st.session_state.chat_messages.append({
+            "role": "assistant",
+            "content": response
+        })
+
 
 if __name__ == "__main__":
     main()
