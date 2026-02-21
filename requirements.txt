@@ -10,11 +10,12 @@ requests
 
 #chatbot 
 dotenv
-langchain.chains
+langchain
 langchain==0.2.16           
 langchain-community==0.2.16
 langchain-text-splitters==0.2.4
 langchain-huggingface==0.0.3
 sentence-transformers
 faiss-cpu
-streamlit python-dotenv
+streamlit 
+python-dotenv

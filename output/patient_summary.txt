@@ -1,3 +1,28 @@
  **Patient Perspective Summary:**
 
-The patient visited the doctor complaining of a headache and fever that started the previous day. They also reported a mild cough and body pain. They had taken paracetamol the night before. The doctor diagnosed a likely viral infection and advised rest, fluids, and prescribed medication. The patient thanked the doctor.
+**Patient Name:** Mr. Siddharth Rana  
+**Age:** 28 years  
+**Gender:** Male  
+**Weight:** 105 Kg  
+**Address:** [Address provided, but incomplete in the original text]
+
+**Consultation Details:**
+
+* **Doctor:** Dr. Manish Sharma (General Physician, Registration Number: HN 012425)
+* **Location:** Sector-12, Chandigarh, India (PIN: 160012)
+
+**Symptoms:**
+
+* Right-sided headache for the past 3 days.
+
+**Diagnosis:** Headache (unspecified)
+
+**Prescription:**
+
+* **NAXDOM 500 TABLET (Domperidone/Naproxen):** 15 tablets. Take one tablet after food, as advised, for 5 days. (For headache)
+* **PANTOP D SR CAPSULE:** 10 capsules. Take one capsule before food, once daily (in the morning), for 5 days.
+* **Nurokind Gold RF Tablet:** 10 tablets. Take one tablet after food, as advised.
+
+**Follow-up:**  Visit as advised.
+
+**Important Note:** This summary is based on the information provided. For any clarification or concerns, please contact your doctor.
