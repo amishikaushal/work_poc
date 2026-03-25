@@ -640,27 +640,23 @@ def main():
 
         st.markdown("### 📊 Analysis Results")
 
-        tab1, tab2 = st.tabs(["👤 Patient Action Plan", "🩺 Doctor Summary"])
+        tab1, tab2 = st.tabs(["👤 Patient Summary", "🩺 Doctor Summary"])
 
         with tab1:
             st.info(st.session_state.patient_res)
             st.download_button(
-                "📩 Download Patient Plan",
+                "📩 Download Patient Summary",
                 st.session_state.patient_res,
-                file_name=f"patient_plan_{target_lang_code}.txt"
+                file_name=f"patient_summary_{target_lang_code}.txt"
             )
 
         with tab2:
-            st.markdown(f"""
-                <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff;">
-                    {st.session_state.doctor_res}
-                </div>
-            """, unsafe_allow_html=True)
+            st.info(st.session_state.doctor_res)
 
             st.download_button(
-                "📂 Download Doctor Summary",
-                st.session_state.doctor_res,
-                file_name=f"doctor_summary_{target_lang_code}.txt"
+            "📂 Download Doctor Summary",
+            st.session_state.doctor_res,
+            file_name=f"doctor_summary_{target_lang_code}.txt"
             )
 
     # ==============================

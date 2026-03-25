@@ -1,12 +1,2 @@
- **Doctor's Perspective Summary:**
-
-**Patient:** Mr. Siddharth Rana, 28-year-old male, presenting with a 3-day history of right-sided headache. No other symptoms reported.
-
-**Diagnosis:** Headache, unspecified.
-
-**Prescription:**
-*   **NAXDOM 500 TABLET (Domperidone/Naproxen):** 15 units after food, as advised for 5 days (for headache).
-*   **PANTOP D SR CAPSULE:** 10 units once daily (morning) before food for 5 days.
-*   **Nurokind Gold RF Tablet:** 10's after food.
-
-**Additional Notes:** 
+**Résumé de la consultation médicale :**  
+Le patient présente des maux de tête, de la fièvre, une légère toux et des douleurs corporelles pendant une journée. J'ai signalé avoir pris du paracétamol hier soir. Probablement une infection virale. Repos conseillé, hydratation et traitement symptomatique prescrit.
