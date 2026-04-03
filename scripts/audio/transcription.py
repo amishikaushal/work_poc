@@ -133,3 +133,31 @@ def transcribe_segments(
     elapsed = time.time() - start_time
     logger.info(f"Transcription completed in {elapsed:.2f}s. Total text segments: {len(final_transcript)}")
     return final_transcript
+
+
+def transcribe_file(wav_file: str) -> str:
+    """
+    Transcribe a whole WAV file and return the plain text (English).
+    Uses faster-whisper when available, otherwise openai-whisper.
+    """
+    logger.info(f"Transcribing full file: {wav_file}")
+    model = _get_whisper_model()
+
+    if _use_faster_whisper:
+        segments, info = model.transcribe(
+            wav_file,
+            beam_size=5,
+            language="en",
+            task="translate"
+        )
+        text = "".join([s.text for s in segments]).strip()
+    else:
+        result = model.transcribe(
+            wav_file,
+            language="en",
+            task="translate"
+        )
+        text = result.get("text", "").strip()
+
+    logger.info(f"Transcription length: {len(text)} chars")
+    return text

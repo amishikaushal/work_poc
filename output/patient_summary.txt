@@ -1,3 +1,28 @@
  **Patient Perspective Summary:**
 
-The patient visited the doctor complaining of a headache and fever that started the previous day. They also reported a mild cough and body pain. They had taken paracetamol the night before. The doctor diagnosed a likely viral infection and advised rest, fluids, and prescribed medication. The patient thanked the doctor.
+**Patient Name:** RonRoy
+**Age:** 34 years
+**Gender:** Male
+**Consultation Date:** 19/02/2024
+**Consultation Type:** Online
+
+**Chief Complaints:**
+* **Sad mood** for the past 4 months, occurring daily with severe intensity.
+* **Persistent negative thoughts and disturbing dreams.**
+* **Existing addiction** (details not specified).
+
+**Previous Treatment:**
+* Consulted for depression last week; medications were taken as prescribed but symptoms persist.
+
+**Vitals:**
+* **Weight:** 59 kg
+* **Height:** 168 cm
+* **Blood Pressure:** 108/76 mmHg
+
+**Diagnosis:**
+* **Depressive Episode**
+
+**Medication Prescribed:**
+* **Scelepra 10mg tablet:** To be taken once daily after food in the morning for one month.
+
+**Note:** The patient reported significant distress from recurring negative thoughts and nightmares despite previous medication.
