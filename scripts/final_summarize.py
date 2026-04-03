@@ -241,9 +241,9 @@
         
 #     run_summarization()
 
-
 import os
 import requests
+import re
 
 # --- CONFIGURATION ---
 API_KEY = "sk_lj92wr1i_R7P7HB77NAGA9T3O6yJRL96k"  # replace with your actual key
@@ -254,6 +254,20 @@ headers = {
     "Content-Type": "application/json"
 }
 
+# --- CLEANING FUNCTION ---
+def clean_response(text: str) -> str:
+    """
+    Removes <think>...</think> and any unwanted tags from model output
+    """
+    # Remove <think>...</think> blocks
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+
+    # Remove any remaining HTML/XML-like tags
+    text = re.sub(r"<.*?>", "", text)
+
+    return text.strip()
+
+
 def run_summarization(text: str, perspective: str) -> str:
     """
     Summarize text into a specific perspective using Sarvam AI.
@@ -263,15 +277,19 @@ def run_summarization(text: str, perspective: str) -> str:
         return "Error: No input text provided for summarization."
 
     payload = {
-        "model": "sarvam-m", 
+        "model": "sarvam-m",
         "messages": [
             {
                 "role": "system",
-                "content": f"You are a professional medical scribe. Provide a concise {perspective} perspective summary of the following medical consultation."
+                "content": (
+                    f"You are a professional medical scribe. "
+                    f"Provide ONLY a clean and concise {perspective} perspective summary. "
+                    f"Do NOT include thinking steps, reasoning, or any tags like <think>."
+                )
             },
             {
                 "role": "user",
-                "content": f"Summarize this text for a {perspective}:\n{text}"
+                "content": f"Summarize the following medical consultation for a {perspective}:\n{text}"
             }
         ],
         "temperature": 0.3,
@@ -280,41 +298,49 @@ def run_summarization(text: str, perspective: str) -> str:
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
+
         if response.status_code == 200:
             data = response.json()
-            return data["choices"][0]["message"]["content"]
+            raw_output = data["choices"][0]["message"]["content"]
+
+            # ✅ CLEAN OUTPUT HERE
+            cleaned_output = clean_response(raw_output)
+
+            return cleaned_output
+
         else:
             return f"Error {response.status_code}: {response.text}"
+
     except Exception as e:
         return f"Request failed: {str(e)}"
 
 
 if __name__ == "__main__":
-    # 1. Locate the current script's directory (D:\POCwork\scripts)
+    # 1. Locate current script directory
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # 2. Setup standard paths
-    # Go up one level to D:\POCwork, then into 'output'
+
+    # 2. Setup paths
     output_dir = os.path.abspath(os.path.join(base_dir, "..", "output"))
     INPUT_PATH = os.path.join(output_dir, "transcript.txt")
-    
+
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
-    #  Read input from the standardized transcript file
+    # 3. Read input
     if os.path.exists(INPUT_PATH):
         with open(INPUT_PATH, "r", encoding="utf-8") as f:
             input_text = f.read()
-        print(f"Successfully loaded transcript from: {INPUT_PATH}")
-        
-        # 3. Generate separate summaries
-        print("Generating Patient Perspective...")
+
+        print(f"✅ Loaded transcript from: {INPUT_PATH}")
+
+        # 4. Generate summaries
+        print("🧠 Generating Patient Perspective...")
         patient_summary = run_summarization(input_text, "Patient")
-        
-        print("Generating Doctor Perspective...")
+
+        print("🧠 Generating Doctor Perspective...")
         doctor_summary = run_summarization(input_text, "Doctor")
 
-        # 4.  Write each perspective to its own file in the 'output' folder
+        # 5. Output files
         pat_out = os.path.join(output_dir, "patient_summary.txt")
         doc_out = os.path.join(output_dir, "doctor_summary.txt")
 
@@ -324,7 +350,9 @@ if __name__ == "__main__":
         with open(doc_out, "w", encoding="utf-8") as f:
             f.write(doctor_summary)
 
-        print(f" Success! Summaries written to:\n - {pat_out}\n - {doc_out}")
-        
+        print("\n✅ SUCCESS!")
+        print(f"📄 Patient Summary: {pat_out}")
+        print(f"📄 Doctor Summary:  {doc_out}")
+
     else:
-        print(f" Error: transcript.txt not found at {INPUT_PATH}")
+        print(f"❌ Error: transcript.txt not found at {INPUT_PATH}")

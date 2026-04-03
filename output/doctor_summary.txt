@@ -1,22 +1,2 @@
- **Doctor's Perspective Summary:**
-
-**Patient:** RonRoy, 34-year-old male
-
-**Consultation Date:** 19/02/2024
-
-**Chief Complaints:** 
-
-* **Depressive Episode (4 months duration):** 
-    * Severe sad mood (daily).
-    * History of negative thoughts and disturbing dreams.
-    * Previous consultation for depression with initial medication compliance, but symptoms persist.
-* **Addiction:**  Present (unspecified).
-
-**Vitals:**
-* Weight: 59 kg, Height: 168 cm, BP: 108/76 mmHg.
-
-**Diagnosis:** Depressive Episode.
-
-**Medication Prescribed:** Scelepra 10mg (1 tablet once daily after food in the morning for 1 month).
-
-**Notes:**  Patient requires ongoing monitoring for depressive symptoms and addiction.
+**Résumé de la consultation médicale :**  
+Le patient présente des maux de tête, de la fièvre, une légère toux et des douleurs corporelles pendant une journée. J'ai signalé avoir pris du paracétamol hier soir. Probablement une infection virale. Repos conseillé, hydratation et traitement symptomatique prescrit.

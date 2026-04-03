@@ -3,4 +3,5 @@ __pycache__/
 .env
 OLDER/
 FINAL_WORKING/
-
+workingstreamlit.docx
+.venv/

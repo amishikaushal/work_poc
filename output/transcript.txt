@@ -1,29 +1,8 @@
-=== SEMANTIC MEDICAL EXTRACTION (LOSSLESS) ===
-
-Dr. MANJUNATH H
-MBBS, DPM
-Neuro Psychiatry • Reg.No. 56722
-Apolo Clinic - Indiranagar
-Plat # 2012, ist floor, Above vision express, 100 Feet Rd, next to
-Starbucks, HAL 2nd Stage, Indiranagar
-Bengaluru - 560038 • Kamataka, INDIA
-WhatsApp E-mail
-APPOINTMENT DETAILS • •919355031397 4 Helpdesk@apollo247.com
-Patient RonRoy • MALE • 34yrs ConsultDate 19/02/2024 at 12:07 PM
-Contact ronroy.apple@icloud.com • •917021797181 ConsultType Online
-UID FTHN.0000119710
-Appt ID 290389
-CHIEF COMPLAINTS
-Sad mood
-Since: 4months • How Often: Daily • Severity: Severe • Details: Consulted last week for depression,
-medication were taken much better but repeated thought, and bad negative dreams distrub him,
-addiction present
-VITALS (as dectared by patient)
-Weight: 59 • Height: 168cm • BP: 108/76 • Temperature: Not Recorded
-[DIAGNOSIS]
-Depressive episode
-% MEDICATIONPRESCRIBED
-1. Scelepra 10mg tablet
-Take 1 tablet(s) once a day for 1 month after food in the morning.
-Tobetaken: Orally
-Page lof 2
+Doctor: Hello, what brings you in today?
+Patient: I've been having a headache and fever since yesterday.
+Doctor: Do you have any other symptoms like cough or cold?
+Patient: Yes, a mild cough and body pain.
+Doctor: Have you taken any medicine so far?
+Patient: I watched the paracetamol last night.
+Doctor: Okay, it looks like a viral infection. I'll prescribe rest, fluids and medication.
+Patient: All right, doctor, thank you.
