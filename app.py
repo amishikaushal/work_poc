@@ -461,9 +461,83 @@ st.markdown("""
         background-color: #ffffff;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
+    
+    /* -------------------------------------- */
+    /* Pill Design Chat Input Box             */
+    /* -------------------------------------- */
+    /* Target the container to make it a pill */
+    [data-testid="stChatInput"] {
+        position: fixed !important;
+        bottom: 25px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 704px !important; /* Matches Streamlit chat messages */
+        background-color: #303134 !important;
+        padding: 5px 25px !important;
+        border-radius: 50px !important;
+        border: none !important;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4) !important;
+        z-index: 1000 !important;
+    }
+    
+    /* Force inner components to be transparent to fix the differently colored rectangle */
+    [data-testid="stChatInput"] > div,
+    [data-testid="stChatInput"] > div > div {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Style the text area inside the pill */
+    [data-testid="stChatInputTextArea"] {
+        background-color: transparent !important;
+        color: #e8eaed !important;
+        font-size: 16px !important;
+        padding-top: 15px !important;
+        padding-right: 50px !important; /* make room for mic */
+    }
+    
+    /* Streamlit's record button styled as the mic icon, absolute positioned inside the pill */
+    div[data-testid="stElementContainer"]:has(#mic_btn_wrapper) + div[data-testid="stElementContainer"] {
+        position: fixed !important;
+        bottom: 37px !important; 
+        left: calc(50% + 245px) !important; /* Positioned closely to the left side of the arrow */
+        z-index: 1001 !important;
+    }
+    div[data-testid="stElementContainer"]:has(#mic_btn_wrapper) + div[data-testid="stElementContainer"] button {
+        background-color: transparent !important;
+        color: #9aa0a6 !important;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        font-size: 22px !important;
+    }
+    div[data-testid="stElementContainer"]:has(#mic_btn_wrapper) + div[data-testid="stElementContainer"] button:hover {
+        color: #ffffff !important;
+        background-color: #4a4b50 !important;
+        border-radius: 50% !important;
+    }
+    
+    /* Style the submit icon to match the white circle with icon */
+    [data-testid="stChatInputSubmitButton"] {
+        background-color: #ffffff !important;
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        margin-left: 15px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    [data-testid="stChatInputSubmitButton"] svg {
+        fill: #000000 !important;
+        color: #000000 !important;
+        width: 20px !important;  
+        height: 20px !important;
+    }
     </style>
     """, unsafe_allow_html=True)
-
 
 # ==============================
 # Build Dynamic RAG
@@ -677,19 +751,17 @@ def main():
 
      
     # ==============================
-    # 🎤 Voice Question (Using Same Recording Logic as Input Section)
+    # 🎤 Voice Question (Integrated into Pill)
     # ==============================
-    st.markdown("### 🎙️ Ask via Voice")
+    st.markdown('<div id="mic_btn_wrapper"></div>', unsafe_allow_html=True)
 
-    voice_duration = st.slider("Recording Duration (sec)", 3, 10, 5, key="chat_voice_duration")
+    if st.button("🎙️", key="chat_record_btn"):
 
-    if st.button("🎤 Record Question", key="chat_record_btn"):
-
-        # Use SAME clean recording logic as consultation input
+        # Hardcoded duration for simplicity since slider is removed
         with st.spinner("Recording..."):
             voice_file = record_audio(
                 output_file="voice_question.wav",
-                duration=voice_duration
+                duration=5
             )
 
         # Transcribe using improved Whisper settings
@@ -732,7 +804,7 @@ def main():
             "content": response
         })
 
-    if prompt := st.chat_input("Ask a question about this case..."):
+    if prompt := st.chat_input("Ask anything"):
 
         with st.chat_message("user"):
             st.markdown(prompt)
