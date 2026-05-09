@@ -401,13 +401,41 @@ import whisper
 # ==============================
 load_dotenv()
 
+
+# Safe rerun helper: call Streamlit's experimental rerun when available,
+# otherwise raise the internal RerunException or fall back to stopping.
+def _safe_rerun():
+    try:
+        st.experimental_rerun()
+        return
+    except Exception:
+        pass
+
+    # Try importing and raising the internal rerun exception used by Streamlit
+    try:
+        from streamlit.runtime.scriptrunner.script_runner import RerunException
+        raise RerunException()
+    except Exception:
+        try:
+            # older/newer internal path
+            from streamlit.runtime.scriptrunner import RerunException as RE
+            raise RE()
+        except Exception:
+            # As a last resort, stop execution; interaction will trigger a rerun
+            try:
+                st.session_state["_needs_rerun_fallback"] = True
+            except Exception:
+                pass
+            st.stop()
+
 if not os.getenv("OPENAI_API_KEY"):
     st.error("🚨 OPENAI_API_KEY not found. Please add it to your .env file.")
     st.stop()
 
 # Backend
 from scripts.main import process_pdf, process_audio
-from scripts.audio.mic_recorder import record_audio
+from scripts.audio.mic_recorder import record_audio, start_recording, stop_recording
+from scripts.audio.transcription import transcribe_file
 
 # RAG Imports
 from langchain_community.vectorstores import FAISS
@@ -450,10 +478,35 @@ st.markdown("""
         margin-bottom: 3rem !important; 
     }
     .stButton>button { 
-        border-radius: 8px; 
+        border-radius: 8px !important; 
         font-weight: 600; 
         height: 3em; 
+        padding: 0.6rem 1rem;
     }
+    /* compact mic buttons only */
+    .mic-button-wrap .stButton>button {
+        border-radius: 12px; 
+        height: 2.6em;
+        width: 2.6em;
+        padding: 0.15rem 0.25rem;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* Recording indicator */
+    .recording-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background: #d9534f;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+        animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink { to { visibility: hidden; } }
+    .recording-label { color: #d9534f; font-weight: 700; vertical-align: middle; }
     .input-card { 
         padding: 20px; 
         border: 1px solid #e6e9ef;
@@ -596,7 +649,13 @@ def main():
         "patient_res": None,
         "doctor_res": None,
         "qa_chain": None,
-        "chat_messages": []
+        "chat_messages": [],
+        "pending_transcription": False,
+        "pending_transcribed_text": None,
+        "chat_recording": False,
+        "chat_recording_path": None,
+        "pending_chat_input": "",
+        "submitted_query": None
     }
 
     for key, value in defaults.items():
@@ -824,6 +883,9 @@ def main():
             "role": "assistant",
             "content": response
         })
+
+    # No automatic posting: transcriptions are placed into the chat input (`pending_chat_input`) and
+    # the user must press the arrow button to send the query for processing.
 
 
 if __name__ == "__main__":

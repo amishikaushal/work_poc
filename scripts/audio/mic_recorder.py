@@ -46,6 +46,7 @@ def record_audio(
     Records audio from the system microphone and saves it as a WAV file.
     Returns the absolute path to the saved file.
     """
+    
     start_time = time.time()
     # Ensure the directory exists
     output_dir = os.path.dirname(os.path.abspath(output_file))
@@ -78,3 +79,75 @@ def record_audio(
     except Exception as e:
         print(f"❌ Error during recording: {e}")
         return None
+
+
+# Non-blocking start/stop recording API for UI toggle use
+_stream = None
+_frames = []
+_output_file = None
+
+def start_recording(output_file="recorded_audio.wav", sample_rate=16000):
+    """
+    Starts a non-blocking recording in the background. Returns the intended output file path.
+    Call `stop_recording()` to finish and save the file.
+    """
+    global _stream, _frames, _output_file
+    if _stream is not None:
+        return None
+
+    _frames = []
+    _output_file = output_file
+
+    def callback(indata, frames, time_info, status):
+        if status:
+            logger.warning(f"InputStream status: {status}")
+        # copy to avoid referencing recycled buffer
+        _frames.append(indata.copy())
+
+    try:
+        _stream = sd.InputStream(samplerate=sample_rate, channels=1, callback=callback)
+        _stream.start()
+        logger.info(f"Started non-blocking recording -> {_output_file}")
+        return os.path.abspath(_output_file)
+    except Exception as e:
+        logger.error(f"Failed to start recording: {e}")
+        _stream = None
+        return None
+
+
+def stop_recording():
+    """
+    Stops a previously started non-blocking recording and writes it to disk.
+    Returns the absolute path to the saved WAV file, or None on error.
+    """
+    global _stream, _frames, _output_file
+    if _stream is None:
+        logger.warning("stop_recording called but no active stream")
+        return None
+
+    try:
+        _stream.stop()
+        _stream.close()
+    except Exception:
+        pass
+
+    if not _frames:
+        logger.warning("No audio frames captured")
+        _stream = None
+        return None
+
+    try:
+        audio = np.concatenate(_frames, axis=0)
+        sf.write(_output_file, audio, 16000)
+        abs_path = os.path.abspath(_output_file)
+        logger.info(f"Recording saved: {abs_path}")
+    except Exception as e:
+        logger.error(f"Failed to write recorded file: {e}")
+        abs_path = None
+
+    # Cleanup
+    _stream = None
+    _frames = []
+    _output_file = None
+
+    return abs_path
