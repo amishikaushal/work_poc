@@ -1,443 +1,28 @@
-# import streamlit as st
-# import os
-# from dotenv import load_dotenv
-# from streamlit_mic_recorder import mic_recorder
-# import whisper
-
-
-# # ==============================
-# # Load Environment Variables
-# # ==============================
-# load_dotenv()
-
-# if not os.getenv("OPENAI_API_KEY"):
-#     st.error("🚨 OPENAI_API_KEY not found. Please add it to your .env file.")
-#     st.stop()
-
-# # Backend
-# from scripts.main import process_pdf, process_audio
-# from scripts.audio.mic_recorder import record_audio
-
-# # RAG Imports
-# from langchain_community.vectorstores import FAISS
-# from langchain_huggingface import HuggingFaceEmbeddings
-# from langchain_community.chat_models import ChatOllama
-# from langchain.chains import ConversationalRetrievalChain
-# from langchain.memory import ConversationBufferMemory
-# from langchain.schema import Document
-# from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-
-# # ==============================
-# # Page Config
-# # ==============================
-# st.set_page_config(
-#     page_title="Medical AI Scribe",
-#     page_icon="⚕️",
-#     layout="wide"
-# )
-
-# # ==============================
-# # Custom Styling (From Code 2)
-# # ==============================
-# st.markdown("""
-#     <style>
-#     .main-header { 
-#         font-size: 3.5rem !important;
-#         color: #007bff !important; 
-#         font-weight: 900 !important; 
-#         text-align: center !important; 
-#         margin-top: -50px !important;
-#         margin-bottom: 0px !important; 
-#         line-height: 1.2 !important;
-#         text-shadow: 3px 3px 6px rgba(0,0,0,0.1) !important;
-#     }
-#     .sub-header { 
-#         text-align: center !important; 
-#         color: #6c757d !important; 
-#         font-size: 1.8rem !important; 
-#         margin-bottom: 3rem !important; 
-#     }
-#     .stButton>button { 
-#         border-radius: 8px; 
-#         font-weight: 600; 
-#         height: 3em; 
-#     }
-#     .input-card { 
-#         padding: 20px; 
-#         border: 1px solid #e6e9ef;
-#         border-radius: 10px; 
-#         background-color: #ffffff;
-#         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-#     }
-#     </style>
-#     """, unsafe_allow_html=True)
-
-
-# # ==============================
-# # Build Dynamic RAG
-# # ==============================
-# def build_rag_from_summaries(patient_text, doctor_text):
-
-#     documents = [
-#         Document(page_content=patient_text),
-#         Document(page_content=doctor_text)
-#     ]
-
-#     splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=800,
-#         chunk_overlap=150
-#     )
-
-#     docs = splitter.split_documents(documents)
-
-#     embeddings = HuggingFaceEmbeddings(
-#         model_name="sentence-transformers/all-MiniLM-L6-v2"
-#     )
-
-#     vectorstore = FAISS.from_documents(docs, embeddings)
-#     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-#     llm = ChatOllama(
-#         model="llama3",
-#         temperature=0
-#     )
-
-#     memory = ConversationBufferMemory(
-#         memory_key="chat_history",
-#         return_messages=True
-#     )
-
-#     qa_chain = ConversationalRetrievalChain.from_llm(
-#         llm=llm,
-#         retriever=retriever,
-#         memory=memory
-#     )
-
-#     return qa_chain
-
-
-# # ==============================
-# # MAIN APP
-# # ==============================
-# def main():
-
-#     st.markdown('<div class="main-header">⚕️ Healthcare AI Assistant</div>', unsafe_allow_html=True)
-#     st.markdown('<div class="sub-header">Automated Medical Scribe & Intelligent Medical Chatbot</div>', unsafe_allow_html=True)
-
-#     # Session Defaults
-#     defaults = {
-#         "final_audio_path": None,
-#         "patient_res": None,
-#         "doctor_res": None,
-#         "qa_chain": None,
-#         "chat_messages": []
-#     }
-
-#     for key, value in defaults.items():
-#         if key not in st.session_state:
-#             st.session_state[key] = value
-
-#     # ==============================
-#     # Sidebar
-#     # ==============================
-#     with st.sidebar:
-#         st.header("⚙️ Settings")
-
-#         lang_map = {
-#             "English": "en",
-#             "French": "fr",
-#             "Spanish": "es",
-#         }
-
-#         selected_lang = st.selectbox("Preferred Output Language", list(lang_map.keys()))
-#         target_lang_code = lang_map[selected_lang]
-
-#         st.divider()
-
-#         if st.button("🗑️ Clear Full Session"):
-#             st.session_state.clear()
-#             st.rerun()
-
-#     # ==============================
-#     # Input Section
-#     # ==============================
-#     col1, col2 = st.columns(2, gap="large")
-
-#     with col1:
-#         st.markdown('<div class="input-card">', unsafe_allow_html=True)
-#         st.subheader("📄 Document Input")
-#         uploaded_pdf = st.file_uploader("Upload Medical Report (PDF)", type=["pdf"])
-#         st.markdown('</div>', unsafe_allow_html=True)
-
-#     with col2:
-#         st.markdown('<div class="input-card">', unsafe_allow_html=True)
-#         st.subheader("🎤 Consultation Audio")
-
-#         audio_choice = st.radio("Select Source:", ["Upload File", "Record Live"], horizontal=True)
-
-#         if audio_choice == "Upload File":
-#             uploaded_audio = st.file_uploader("Upload WAV/MP3/M4A", type=["wav", "mp3", "m4a"])
-#             if uploaded_audio:
-#                 temp_audio = f"temp_{uploaded_audio.name}"
-#                 with open(temp_audio, "wb") as f:
-#                     f.write(uploaded_audio.getbuffer())
-#                 st.session_state.final_audio_path = temp_audio
-#                 st.audio(temp_audio)
-
-#         else:
-#             duration = st.slider("Record Duration (sec)", 5, 120, 30)
-#             if st.button("🎙️ Start Recording"):
-#                 with st.status("Recording..."):
-#                     st.session_state.final_audio_path = record_audio(
-#                         output_file="live_consultation.wav",
-#                         duration=duration
-#                     )
-
-#             if st.session_state.final_audio_path and os.path.exists(st.session_state.final_audio_path):
-#                 st.success("Recording ready!")
-#                 st.audio(st.session_state.final_audio_path)
-
-#         st.markdown('</div>', unsafe_allow_html=True)
-
-#     # ==============================
-#     # Generate AI Analysis
-#     # ==============================
-#     st.divider()
-
-#     if st.button("✨ Generate AI Analysis", use_container_width=True, type="primary"):
-
-#         if not uploaded_pdf and not st.session_state.final_audio_path:
-#             st.warning("Please provide PDF or Audio.")
-#         else:
-#             with st.status("Processing...", expanded=True):
-#                 try:
-#                     st.session_state.qa_chain = None
-#                     st.session_state.chat_messages = []
-
-#                     if uploaded_pdf:
-#                         temp_pdf = "process_input.pdf"
-#                         with open(temp_pdf, "wb") as f:
-#                             f.write(uploaded_pdf.getbuffer())
-
-#                         st.session_state.patient_res, st.session_state.doctor_res = process_pdf(
-#                             temp_pdf,
-#                             target_lang_code
-#                         )
-
-#                     else:
-#                         st.session_state.patient_res, st.session_state.doctor_res = process_audio(
-#                             st.session_state.final_audio_path,
-#                             target_lang_code
-#                         )
-
-#                     # Build RAG
-#                     st.session_state.qa_chain = build_rag_from_summaries(
-#                         st.session_state.patient_res,
-#                         st.session_state.doctor_res
-#                     )
-
-#                     st.success("Analysis Complete & Chatbot Ready!")
-
-#                 except Exception as e:
-#                     st.error(f"Processing Error: {e}")
-
-#     # ==============================
-#     # Results Display
-#     # ==============================
-#     if st.session_state.patient_res and st.session_state.doctor_res:
-
-#         st.markdown("### 📊 Analysis Results")
-
-#         tab1, tab2 = st.tabs(["👤 Patient Action Plan", "🩺 Doctor Summary"])
-
-#         with tab1:
-#             st.info(st.session_state.patient_res)
-#             st.download_button(
-#                 "📩 Download Patient Plan",
-#                 st.session_state.patient_res,
-#                 file_name=f"patient_plan_{target_lang_code}.txt"
-#             )
-
-#         with tab2:
-#             st.markdown(f"""
-#                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px; border-left: 5px solid #007bff;">
-#                     {st.session_state.doctor_res}
-#                 </div>
-#             """, unsafe_allow_html=True)
-
-#             st.download_button(
-#                 "📂 Download Doctor Summary",
-#                 st.session_state.doctor_res,
-#                 file_name=f"doctor_summary_{target_lang_code}.txt"
-#             )
-
-#     # ==============================
-#     # RAG CHATBOT
-#     # ==============================
-#     st.divider()
-#     st.header("🏥 Medical Knowledge Chatbot")
-
-#     if st.session_state.qa_chain is None:
-#         st.info("Generate AI Analysis first to activate chatbot.")
-#         return
-
-#     qa_chain = st.session_state.qa_chain
-
-#     for message in st.session_state.chat_messages:
-#         with st.chat_message(message["role"]):
-#             st.markdown(message["content"])
-
-#        # ==============================
-#     # 🎤 Voice Question (Working Version)
-#     # ==============================
-#     st.markdown("### 🎙️ Ask via Voice")
-
-#     audio_data = mic_recorder(
-#         start_prompt="🎤 Start Recording",
-#         stop_prompt="⏹️ Stop & Send",
-#         just_once=True,
-#         use_container_width=True
-#     )
-
-#     if audio_data:
-
-#         # Save recorded audio
-#         import subprocess
-
-#         # Save original browser audio (webm)
-#         raw_file = "voice_question.webm"
-#         with open(raw_file, "wb") as f:
-#             f.write(audio_data["bytes"])
-
-#         # Convert properly to real WAV
-#         voice_file = "voice_question.wav"
-
-#         subprocess.run([
-#              "ffmpeg",
-#             "-y",
-#             "-i", raw_file,
-#             "-ac", "1",
-#             "-ar", "16000",
-#             "-f", "wav",
-#             voice_file
-#         ], check=True)
-
-
-#         with st.spinner("Transcribing..."):
-
-#             model = whisper.load_model("base")   # lightweight & fast
-#             result = model.transcribe(
-#                     voice_file,
-#                     language="en",      # 🔥 Force English
-#                     task="transcribe",  # 🔥 Ensure no translation
-#                     fp16=False          # 🔥 Important on CPU (Windows)
-#                 )
-#         voice_prompt = result["text"].strip()
-
-
-#         # Show user message
-#         with st.chat_message("user"):
-#             st.markdown(voice_prompt)
-
-#         st.session_state.chat_messages.append({
-#             "role": "user",
-#             "content": voice_prompt
-#         })
-
-#         # Get assistant response
-#         with st.chat_message("assistant"):
-#             with st.spinner("Analyzing..."):
-#                 result = qa_chain({"question": f"Answer this medical question directly and concisely:\n\n{voice_prompt}"
-# })
-
-#                 response = result["answer"]
-#                 st.markdown(response)
-
-#         st.session_state.chat_messages.append({
-#             "role": "assistant",
-#             "content": response
-#         })
-
-#     if prompt := st.chat_input("Ask a question about this case..."):
-
-#         with st.chat_message("user"):
-#             st.markdown(prompt)
-
-#         st.session_state.chat_messages.append({
-#             "role": "user",
-#             "content": prompt
-#         })
-
-#         with st.chat_message("assistant"):
-#             with st.spinner("Analyzing..."):
-#                 result = qa_chain({"question": f"Answer this medical question directly and concisely:\n\n{prompt}"
-# })
-
-#                 response = result["answer"]
-#                 st.markdown(response)
-
-#         st.session_state.chat_messages.append({
-#             "role": "assistant",
-#             "content": response
-#         })
-
-
-# if __name__ == "__main__":
-#     main()
-   
-
-
-
-import streamlit as st
 import os
-from dotenv import load_dotenv
-# from streamlit_mic_recorder import mic_recorder
+import logging
+import streamlit as st
 import whisper
+from dotenv import load_dotenv
 
+# ── Logging — configured once here; all submodules use getLogger(__name__) ─────
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)s — %(message)s",
+    datefmt="%H:%M:%S",
+)
 
-# ==============================
-# Load Environment Variables
-# ==============================
+# ── Environment ───────────────────────────────────────────────────────────────
 load_dotenv()
 
-
-# Safe rerun helper: call Streamlit's experimental rerun when available,
-# otherwise raise the internal RerunException or fall back to stopping.
-def _safe_rerun():
-    try:
-        st.experimental_rerun()
-        return
-    except Exception:
-        pass
-
-    # Try importing and raising the internal rerun exception used by Streamlit
-    try:
-        from streamlit.runtime.scriptrunner.script_runner import RerunException
-        raise RerunException()
-    except Exception:
-        try:
-            # older/newer internal path
-            from streamlit.runtime.scriptrunner import RerunException as RE
-            raise RE()
-        except Exception:
-            # As a last resort, stop execution; interaction will trigger a rerun
-            try:
-                st.session_state["_needs_rerun_fallback"] = True
-            except Exception:
-                pass
-            st.stop()
-
 if not os.getenv("OPENAI_API_KEY"):
-    st.error("🚨 OPENAI_API_KEY not found. Please add it to your .env file.")
+    st.error("🚨 OPENAI_API_KEY not found. Add it to your .env file.")
     st.stop()
 
-# Backend
+# ── Backend imports ────────────────────────────────────────────────────────────
 from scripts.main import process_pdf, process_audio
-from scripts.audio.mic_recorder import record_audio, start_recording, stop_recording
-from scripts.audio.transcription import transcribe_file
+from scripts.audio.mic_recorder import record_audio
 
-# RAG Imports
+# ── RAG imports ────────────────────────────────────────────────────────────────
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.chat_models import ChatOllama
@@ -446,259 +31,163 @@ from langchain.memory import ConversationBufferMemory
 from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+# ── Page config ────────────────────────────────────────────────────────────────
+st.set_page_config(page_title="Medical AI Scribe", page_icon="⚕️", layout="wide")
 
-# ==============================
-# Page Config
-# ==============================
-st.set_page_config(
-    page_title="Medical AI Scribe",
-    page_icon="⚕️",
-    layout="wide"
-)
-
-# ==============================
-# Custom Styling (From Code 2)
-# ==============================
 st.markdown("""
-    <style>
-    .main-header { 
-        font-size: 3.5rem !important;
-        color: #007bff !important; 
-        font-weight: 900 !important; 
-        text-align: center !important; 
-        margin-top: -50px !important;
-        margin-bottom: 0px !important; 
-        line-height: 1.2 !important;
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.1) !important;
+<style>
+    .main-header {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #1a73e8;
+        text-align: center;
+        margin-bottom: 0.2rem;
     }
-    .sub-header { 
-        text-align: center !important; 
-        color: #6c757d !important; 
-        font-size: 1.8rem !important; 
-        margin-bottom: 3rem !important; 
+    .sub-header {
+        text-align: center;
+        color: #5f6368;
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
     }
-    .stButton>button { 
-        border-radius: 8px !important; 
-        font-weight: 600; 
-        height: 3em; 
-        padding: 0.6rem 1rem;
+    .stButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        height: 2.8em;
     }
-    /* compact mic buttons only */
-    .mic-button-wrap .stButton>button {
-        border-radius: 12px; 
-        height: 2.6em;
-        width: 2.6em;
-        padding: 0.15rem 0.25rem;
-        font-size: 1.1rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-    /* Recording indicator */
-    .recording-dot {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        background: #d9534f;
-        border-radius: 50%;
-        margin-right: 8px;
-        vertical-align: middle;
-        animation: blink 1s steps(2, start) infinite;
-    }
-    @keyframes blink { to { visibility: hidden; } }
-    .recording-label { color: #d9534f; font-weight: 700; vertical-align: middle; }
-    .input-card { 
-        padding: 20px; 
-        border: 1px solid #e6e9ef;
-        border-radius: 10px; 
-        background-color: #ffffff;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+</style>
+""", unsafe_allow_html=True)
 
 
-# ==============================
-# Build Dynamic RAG
-# ==============================
-def build_rag_from_summaries(patient_text, doctor_text):
+# ── Cached resource loaders (loaded once per server session) ───────────────────
+@st.cache_resource
+def load_whisper_model():
+    """Load Whisper 'small' model once for the entire app lifetime."""
+    return whisper.load_model("small")
 
-    documents = [
+
+@st.cache_resource
+def load_embeddings():
+    """Load HuggingFace sentence embeddings once for the entire app lifetime."""
+    return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+
+# ── RAG chain builder ──────────────────────────────────────────────────────────
+def build_rag_chain(patient_text: str, doctor_text: str):
+    """Build a ConversationalRetrievalChain from the two generated summaries."""
+    docs = RecursiveCharacterTextSplitter(
+        chunk_size=800, chunk_overlap=150
+    ).split_documents([
         Document(page_content=patient_text),
-        Document(page_content=doctor_text)
-    ]
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=150
+        Document(page_content=doctor_text),
+    ])
+    vectorstore = FAISS.from_documents(docs, load_embeddings())
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    return ConversationalRetrievalChain.from_llm(
+        llm=ChatOllama(model="llama3", temperature=0),
+        retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
+        memory=memory,
     )
 
-    docs = splitter.split_documents(documents)
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-
-    vectorstore = FAISS.from_documents(docs, embeddings)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-    llm = ChatOllama(
-        model="llama3",
-        temperature=0
-    )
-
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True
-    )
-
-    qa_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        memory=memory
-    )
-
-    return qa_chain
-
-
-# ==============================
-# MAIN APP
-# ==============================
-def main():
-
-    st.markdown('<div class="main-header">⚕️ Healthcare AI Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Automated Medical Scribe & Intelligent Medical Chatbot</div>', unsafe_allow_html=True)
-
-    # Session Defaults
+# ── Session state init ─────────────────────────────────────────────────────────
+def _init_session():
     defaults = {
         "final_audio_path": None,
         "patient_res": None,
         "doctor_res": None,
         "qa_chain": None,
         "chat_messages": [],
-        "pending_transcription": False,
-        "pending_transcribed_text": None,
-        "chat_recording": False,
-        "chat_recording_path": None,
-        "pending_chat_input": "",
-        "submitted_query": None
     }
-
-    for key, value in defaults.items():
+    for key, val in defaults.items():
         if key not in st.session_state:
-            st.session_state[key] = value
+            st.session_state[key] = val
 
-    # ==============================
-    # Sidebar
-    # ==============================
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+def main():
+    st.markdown('<div class="main-header">⚕️ Healthcare AI Assistant</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Automated Medical Scribe & Intelligent Chatbot</div>', unsafe_allow_html=True)
+
+    _init_session()
+
+    # ── Sidebar ────────────────────────────────────────────────────────────────
     with st.sidebar:
         st.header("⚙️ Settings")
-
-        lang_map = {
-            "English": "en",
-            "French": "fr",
-            "Spanish": "es",
-        }
-
-        selected_lang = st.selectbox("Preferred Output Language", list(lang_map.keys()))
-        target_lang_code = lang_map[selected_lang]
-
+        lang_map = {"English": "en", "French": "fr", "Spanish": "es"}
+        selected_lang = st.selectbox("Output Language", list(lang_map.keys()))
+        target_lang = lang_map[selected_lang]
         st.divider()
-
-        if st.button("🗑️ Clear Full Session"):
+        if st.button("🗑️ Clear Session"):
             st.session_state.clear()
             st.rerun()
 
-    # ==============================
-    # Input Section
-    # ==============================
+    # ── Input section ──────────────────────────────────────────────────────────
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        st.markdown('<div class="input-card">', unsafe_allow_html=True)
         st.subheader("📄 Document Input")
         uploaded_pdf = st.file_uploader("Upload Medical Report (PDF)", type=["pdf"])
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="input-card">', unsafe_allow_html=True)
         st.subheader("🎤 Consultation Audio")
-
-        audio_choice = st.radio("Select Source:", ["Upload File", "Record Live"], horizontal=True)
+        audio_choice = st.radio("Source", ["Upload File", "Record Live"], horizontal=True)
 
         if audio_choice == "Upload File":
-            uploaded_audio = st.file_uploader("Upload WAV/MP3/M4A", type=["wav", "mp3", "m4a"])
+            uploaded_audio = st.file_uploader("Upload WAV / MP3 / M4A", type=["wav", "mp3", "m4a"])
             if uploaded_audio:
-                temp_audio = f"temp_{uploaded_audio.name}"
-                with open(temp_audio, "wb") as f:
+                temp_path = f"temp_{uploaded_audio.name}"
+                with open(temp_path, "wb") as f:
                     f.write(uploaded_audio.getbuffer())
-                st.session_state.final_audio_path = temp_audio
-                st.audio(temp_audio)
-
+                st.session_state.final_audio_path = temp_path
+                st.audio(temp_path)
         else:
             duration = st.slider("Record Duration (sec)", 5, 120, 30)
             if st.button("🎙️ Start Recording"):
-                with st.status("Recording..."):
+                with st.spinner(f"Recording for {duration}s…"):
                     st.session_state.final_audio_path = record_audio(
-                        output_file="live_consultation.wav",
-                        duration=duration
+                        output_file="live_consultation.wav", duration=duration
                     )
-
             if st.session_state.final_audio_path and os.path.exists(st.session_state.final_audio_path):
-                st.success("Recording ready!")
+                st.success("✅ Recording ready")
                 st.audio(st.session_state.final_audio_path)
 
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # ==============================
-    # Generate AI Analysis
-    # ==============================
     st.divider()
 
+    # ── Generate analysis ──────────────────────────────────────────────────────
     if st.button("✨ Generate AI Analysis", use_container_width=True, type="primary"):
-
-        if not uploaded_pdf and not st.session_state.final_audio_path:
-            st.warning("Please provide PDF or Audio.")
+        has_input = uploaded_pdf or st.session_state.final_audio_path
+        if not has_input:
+            st.warning("Please provide a PDF report or an audio recording first.")
         else:
-            with st.status("Processing...", expanded=True):
+            with st.status("Processing…", expanded=True):
                 try:
                     st.session_state.qa_chain = None
                     st.session_state.chat_messages = []
 
                     if uploaded_pdf:
-                        temp_pdf = "process_input.pdf"
-                        with open(temp_pdf, "wb") as f:
+                        pdf_path = "process_input.pdf"
+                        with open(pdf_path, "wb") as f:
                             f.write(uploaded_pdf.getbuffer())
-
                         st.session_state.patient_res, st.session_state.doctor_res = process_pdf(
-                            temp_pdf,
-                            target_lang_code
+                            pdf_path, target_lang
                         )
-
                     else:
                         st.session_state.patient_res, st.session_state.doctor_res = process_audio(
-                            st.session_state.final_audio_path,
-                            target_lang_code
+                            st.session_state.final_audio_path, target_lang
                         )
 
-                    # Build RAG
-                    st.session_state.qa_chain = build_rag_from_summaries(
+                    st.write("Building knowledge base…")
+                    st.session_state.qa_chain = build_rag_chain(
                         st.session_state.patient_res,
-                        st.session_state.doctor_res
+                        st.session_state.doctor_res,
                     )
-
-                    st.success("Analysis Complete & Chatbot Ready!")
-
+                    st.success("✅ Analysis complete. Chatbot is ready!")
                 except Exception as e:
-                    st.error(f"Processing Error: {e}")
+                    st.error(f"Processing error: {e}")
 
-    # ==============================
-    # Results Display
-    # ==============================
+    # ── Results ────────────────────────────────────────────────────────────────
     if st.session_state.patient_res and st.session_state.doctor_res:
-
         st.markdown("### 📊 Analysis Results")
-
         tab1, tab2 = st.tabs(["👤 Patient Summary", "🩺 Doctor Summary"])
 
         with tab1:
@@ -706,114 +195,72 @@ def main():
             st.download_button(
                 "📩 Download Patient Summary",
                 st.session_state.patient_res,
-                file_name=f"patient_summary_{target_lang_code}.txt"
+                file_name=f"patient_summary_{target_lang}.txt",
             )
 
         with tab2:
             st.info(st.session_state.doctor_res)
-
             st.download_button(
-            "📂 Download Doctor Summary",
-            st.session_state.doctor_res,
-            file_name=f"doctor_summary_{target_lang_code}.txt"
+                "📂 Download Doctor Summary",
+                st.session_state.doctor_res,
+                file_name=f"doctor_summary_{target_lang}.txt",
             )
 
-    # ==============================
-    # RAG CHATBOT
-    # ==============================
+    # ── Chatbot ────────────────────────────────────────────────────────────────
     st.divider()
     st.header("🏥 Medical Knowledge Chatbot")
 
     if st.session_state.qa_chain is None:
-        st.info("Generate AI Analysis first to activate chatbot.")
+        st.info("Generate AI Analysis first to activate the chatbot.")
         return
 
-    qa_chain = st.session_state.qa_chain
+    # Render chat history
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    for message in st.session_state.chat_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-     
-    # ==============================
-    # 🎤 Voice Question (Using Same Recording Logic as Input Section)
-    # ==============================
-    st.markdown("### 🎙️ Ask via Voice")
-
-    voice_duration = st.slider("Recording Duration (sec)", 3, 10, 5, key="chat_voice_duration")
+    # Voice question
+    st.markdown("#### 🎙️ Ask via Voice")
+    voice_duration = st.slider("Duration (sec)", 3, 30, 5, key="chat_voice_duration")
 
     if st.button("🎤 Record Question", key="chat_record_btn"):
+        with st.spinner(f"Recording for {voice_duration}s…"):
+            voice_file = record_audio(output_file="voice_question.wav", duration=voice_duration)
 
-        # Use SAME clean recording logic as consultation input
-        with st.spinner("Recording..."):
-            voice_file = record_audio(
-                output_file="voice_question.wav",
-                duration=voice_duration
-            )
-
-        # Transcribe using improved Whisper settings
-        with st.spinner("Transcribing..."):
-
-            model = whisper.load_model("small")  # more accurate than base
-
-            result = model.transcribe(
+        with st.spinner("Transcribing…"):
+            result = load_whisper_model().transcribe(
                 voice_file,
                 language="en",
                 task="transcribe",
                 temperature=0.0,
                 beam_size=5,
-                best_of=5,
-                fp16=False
+                fp16=False,
             )
-
         voice_prompt = result["text"].strip()
 
-        # Display EXACT transcription
         with st.chat_message("user"):
             st.markdown(voice_prompt)
+        st.session_state.chat_messages.append({"role": "user", "content": voice_prompt})
 
-        st.session_state.chat_messages.append({
-            "role": "user",
-            "content": voice_prompt
-        })
-
-    # Send clean question to RAG
         with st.chat_message("assistant"):
-            with st.spinner("Analyzing..."):
-                result = st.session_state.qa_chain.invoke({
-                    "question": voice_prompt
-                })
-                response = result["answer"]
-                st.markdown(response)
+            with st.spinner("Analyzing…"):
+                answer = st.session_state.qa_chain.invoke({"question": voice_prompt})["answer"]
+            st.markdown(answer)
+        st.session_state.chat_messages.append({"role": "assistant", "content": answer})
 
-        st.session_state.chat_messages.append({
-            "role": "assistant",
-            "content": response
-        })
-
-    if prompt := st.chat_input("Ask a question about this case..."):
-
+    # Text question
+    if prompt := st.chat_input("Ask a question about this case…"):
         with st.chat_message("user"):
             st.markdown(prompt)
-
-        st.session_state.chat_messages.append({
-            "role": "user",
-            "content": prompt
-        })
+        st.session_state.chat_messages.append({"role": "user", "content": prompt})
 
         with st.chat_message("assistant"):
-            with st.spinner("Analyzing..."):
-                result = st.session_state.qa_chain.invoke({"question": f"Answer this medical question directly and concisely:\n\n{prompt}"})
-            response = result["answer"]
-            st.markdown(response)
-
-        st.session_state.chat_messages.append({
-            "role": "assistant",
-            "content": response
-        })
-
-    # No automatic posting: transcriptions are placed into the chat input (`pending_chat_input`) and
-    # the user must press the arrow button to send the query for processing.
+            with st.spinner("Analyzing…"):
+                answer = st.session_state.qa_chain.invoke(
+                    {"question": f"Answer this medical question directly and concisely:\n\n{prompt}"}
+                )["answer"]
+            st.markdown(answer)
+        st.session_state.chat_messages.append({"role": "assistant", "content": answer})
 
 
 if __name__ == "__main__":

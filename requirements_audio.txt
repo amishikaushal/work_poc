@@ -8,4 +8,4 @@ librosa
 noisereduce
 sounddevice
 faster-whisper
-
+whisper

@@ -1,46 +1,44 @@
+"""
+scripts/audio/audio_preprocess.py
+──────────────────────────────────
+Converts input audio/video files to 16 kHz mono WAV format
+required by speaker diarisation and transcription models.
+"""
 import os
 import subprocess
 import logging
-import time
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 def convert_to_wav(input_file: str) -> str:
     """
-    Converts an input audio/video file into a 16kHz mono WAV file.
-    This format is required for speaker diarization and transcription models.
-    Returns the path to the WAV file.
-    """
-    start_time = time.time()
+    Convert any audio/video file to a 16 kHz mono WAV.
 
-    # If the input file is already a WAV file, no conversion is needed
+    If the input is already a WAV file it is returned as-is.
+
+    Args:
+        input_file: Path to the source audio/video file.
+
+    Returns:
+        Path to the resulting WAV file.
+
+    Raises:
+        subprocess.CalledProcessError: If FFmpeg conversion fails.
+    """
     if input_file.lower().endswith(".wav"):
-        logger.info(f"Input file is already WAV format: {input_file}")
+        logger.info("Input is already WAV; skipping conversion: %s", input_file)
         return input_file
 
-    # Extract the base file name (without extension)
-    base_name = os.path.splitext(input_file)[0]
+    wav_file = os.path.splitext(input_file)[0] + ".wav"
+    logger.info("Converting %s → %s", input_file, wav_file)
 
-    # Create the output WAV file name
-    wav_file = base_name + ".wav"
-
-    # Use FFmpeg to convert the input file to:
-    # - mono audio (1 channel)
-    # - 16,000 Hz sampling rate
-    logger.info(f"Starting WAV conversion: {input_file}")
     subprocess.run(
-        [
-            "ffmpeg", "-y",          # Overwrite output file if it exists
-            "-i", input_file,        # Input audio/video file
-            "-ac", "1",              # Convert to mono
-            "-ar", "16000",          # Set sampling rate to 16kHz
-            wav_file                 # Output WAV file
-        ],
-        check=True                  # Raise error if FFmpeg fails
+        ["ffmpeg", "-y", "-i", input_file, "-ac", "1", "-ar", "16000", wav_file],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
-    elapsed = time.time() - start_time
-    logger.info(f"WAV conversion completed in {elapsed:.2f}s: {wav_file}")
-    # Return the path of the converted WAV file
+    logger.info("Conversion complete: %s", wav_file)
     return wav_file

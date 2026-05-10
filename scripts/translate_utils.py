@@ -1,74 +1,90 @@
+"""
+scripts/translate_utils.py
+───────────────────────────
+Language detection and text translation utilities used by the processing
+pipelines, plus a helper for persisting diarised audio transcripts to disk.
+"""
+import os
+import logging
 import requests
 from langdetect import detect
 
-def detect_language(text):
-    """Local and Free detection using langdetect."""
+logger = logging.getLogger(__name__)
+
+# Google Translate unofficial endpoint — no API key required, handles chunking
+_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
+_MAX_CHUNK_CHARS = 4_500
+
+
+# ── Language detection ─────────────────────────────────────────────────────────
+
+def detect_language(text: str) -> str:
+    """
+    Detect the language of *text* using langdetect.
+
+    Returns an ISO 639-1 language code (e.g. "en", "fr").
+    Falls back to "en" on any error.
+    """
     try:
         return detect(text[:500])
-    except:
+    except Exception:
+        logger.warning("Language detection failed; defaulting to 'en'.")
         return "en"
 
-def translate_text(text, source_lang="auto", target_lang="en"):
+
+# ── Text translation ───────────────────────────────────────────────────────────
+
+def translate_text(
+    text: str,
+    source_lang: str = "auto",
+    target_lang: str = "en",
+) -> str:
     """
-    Universal Translator for Stage 1 (OCR Cleanup) and Stage 2 (Final Summary).
+    Translate *text* from *source_lang* to *target_lang*.
+
+    Long texts are split into chunks of up to 4 500 characters so they
+    fit within the unofficial Google Translate endpoint's limits.
+
+    Returns the original text unchanged if source == target, or on error.
     """
     if source_lang == target_lang:
         return text
 
-    # Handle character limits by chunking
-    MAX_CHARS = 4500 
-    chunks = [text[i:i + MAX_CHARS] for i in range(0, len(text), MAX_CHARS)]
-    translated_parts = []
+    chunks = [text[i : i + _MAX_CHUNK_CHARS] for i in range(0, len(text), _MAX_CHUNK_CHARS)]
+    translated_parts: list[str] = []
 
-    url = "https://translate.googleapis.com/translate_a/single"
-    
     try:
         for chunk in chunks:
-            params = {
-                "client": "gtx",
-                "sl": source_lang,
-                "tl": target_lang,
-                "dt": "t",
-                "q": chunk
-            }
-            
-            response = requests.get(url, params=params, timeout=15)
-            result = response.json()
-            
-            # Reconstruct the text from the JSON response structure
-            chunk_translation = "".join([part[0] for part in result[0] if part[0]])
-            translated_parts.append(chunk_translation)
+            params = {"client": "gtx", "sl": source_lang, "tl": target_lang, "dt": "t", "q": chunk}
+            resp   = requests.get(_TRANSLATE_URL, params=params, timeout=15)
+            result = resp.json()
+            translated_parts.append("".join(part[0] for part in result[0] if part[0]))
 
         return " ".join(translated_parts)
 
-    except Exception as e:
-        print(f"!!! Translation Error: {e}")
+    except Exception as exc:
+        logger.error("Translation error: %s — returning original text.", exc)
         return text
-    
 
-import os
 
-def save_audio_output(
-    segments: list[dict],
-    role_map: dict,
-    input_file: str
-):
-    # Define the output directory where the final transcript will be stored
-    output_dir = "Output"
+# ── Audio transcript persistence ───────────────────────────────────────────────
 
-    # Create the output directory if it does not already exist
+def save_audio_output(segments: list[dict], role_map: dict, input_file: str) -> None:
+    """
+    Write the diarised, role-labelled transcript to output/transcript.txt.
+
+    Args:
+        segments:   List of {speaker, text, …} dicts from transcription.
+        role_map:   Speaker-ID → role mapping from role_inference.
+        input_file: Original source audio path (used only for logging).
+    """
+    output_dir  = "output"
+    output_path = os.path.join(output_dir, "transcript.txt")
     os.makedirs(output_dir, exist_ok=True)
 
-    # Create the final output file path (Fixed to transcript.txt)
-    # Using 'output_dir' which should be pointing to your main output folder
-    output_path = os.path.join(output_dir, "transcript.txt")
-
-    # Write the final diarized transcript to the fixed text file
-    # Speaker IDs are replaced with inferred roles (Doctor / Patient)
     with open(output_path, "w", encoding="utf-8") as f:
         for seg in segments:
-            role = role_map[seg["speaker"]]
+            role = role_map.get(seg["speaker"], seg["speaker"])
             f.write(f"{role}: {seg['text']}\n")
 
-    # Print confirmation message after saving the output
-    print(f"✅ Final audio transcript saved at: {os.path.abspath(output_path)}")
+    logger.info("Audio transcript saved: %s (source: %s)", os.path.abspath(output_path), input_file)

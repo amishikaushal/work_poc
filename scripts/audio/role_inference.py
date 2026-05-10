@@ -1,51 +1,54 @@
+"""
+scripts/audio/role_inference.py
+────────────────────────────────
+Infers Doctor / Patient roles from diarised, transcribed segments
+using keyword scoring on the spoken content.
+"""
 import logging
-import time
 from collections import defaultdict
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Keywords that are statistically more likely to be spoken by a doctor
+_DOCTOR_KEYWORDS = [
+    "since when", "how long", "do you have", "any history",
+    "diagnosis", "treatment", "prescribe", "recommend", "you should",
+]
+
 
 def infer_roles(segments: list[dict]) -> dict:
     """
-    Infers Doctor / Patient roles based on spoken content.
-    Returns a dictionary mapping speaker IDs to their roles.
+    Map each speaker ID to either "Doctor" or "Patient".
+
+    The speaker whose aggregated text contains the most doctor-like
+    keywords is labelled "Doctor"; all others are "Patient".
+
+    Args:
+        segments: List of {start, end, speaker, text} dicts.
+
+    Returns:
+        Dict mapping speaker IDs to role strings, e.g.
+        {"speaker_0": "Doctor", "speaker_1": "Patient"}.
     """
-    start_time = time.time()
-    logger.info(f"Starting role inference for {len(segments)} segments")
-
-    # Dictionary to collect all spoken text for each speaker
-    # Example: {"speaker_0": "text...", "speaker_1": "text..."}
-    speaker_text = defaultdict(str)
-
-    # Combine all text spoken by each speaker
+    # Aggregate all text per speaker
+    speaker_text: dict[str, str] = defaultdict(str)
     for seg in segments:
         speaker_text[seg["speaker"]] += " " + seg["text"]
 
-    # Keywords that are commonly used by doctors during consultations
-    doctor_keywords = [
-        "since when", "how long", "do you have",
-        "any history", "diagnosis", "treatment",
-        "prescribe", "recommend", "you should"
-    ]
-
-    # Function to calculate a "doctor-likeness" score for a speaker
-    # The more medical or questioning keywords found, the higher the score
-    def score(text: str) -> int:
+    def _doctor_score(text: str) -> int:
         text = text.lower()
-        return sum(kw in text for kw in doctor_keywords)
+        return sum(kw in text for kw in _DOCTOR_KEYWORDS)
 
-    # Calculate scores for each speaker based on their spoken content
-    scores = {spk: score(txt) for spk, txt in speaker_text.items()}
-
-    # The speaker with the highest score is assumed to be the doctor
+    scores = {spk: _doctor_score(txt) for spk, txt in speaker_text.items()}
     doctor_speaker = max(scores, key=scores.get)
 
-    # Assign roles to each speaker
-    role_map = {}
-    for spk in scores:
-        role_map[spk] = "Doctor" if spk == doctor_speaker else "Patient"
+    role_map = {
+        spk: "Doctor" if spk == doctor_speaker else "Patient"
+        for spk in scores
+    }
 
-    elapsed = time.time() - start_time
-    logger.info(f"Role inference completed in {elapsed:.2f}s. Doctor: {doctor_speaker}, Total speakers: {len(role_map)}")
-    # Return the final mapping of speaker IDs to roles
+    logger.info(
+        "Role inference complete — Doctor: %s | Speakers: %s",
+        doctor_speaker, list(role_map.keys()),
+    )
     return role_map

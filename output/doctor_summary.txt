@@ -1,2 +1,5 @@
-**Résumé de la consultation médicale :**  
-Le patient présente des maux de tête, de la fièvre, une légère toux et des douleurs corporelles pendant une journée. J'ai signalé avoir pris du paracétamol hier soir. Probablement une infection virale. Repos conseillé, hydratation et traitement symptomatique prescrit.
+**Doctor's Summary:**  
+Mr. Siddharth Rana (28M, 105 kg) presented with a 3-day history of right-sided headache. Diagnosed with unspecified headache. Prescribed:  
+1. **NAXDOM 500** (Domperidone 10mg + Naproxen 500mg): 15 tablets post-meal for 5 days (analgesic/antiemetic).  
+2. **PANTOP D SR** (Pantoprazole 40mg): 10 capsules pre-meal once daily (morning) for 5 days (Gastroprotection).  
+3. **Nurokind Gold RF**: 10 tablets post-meal (neuro supplement). Advised follow-up.

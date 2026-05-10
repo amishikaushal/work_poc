@@ -1,163 +1,110 @@
-import os
+"""
+scripts/audio/transcription.py
+──────────────────────────────
+Transcribes diarised speaker segments or a whole WAV file to English text.
+Prefers faster-whisper when installed; falls back to openai-whisper.
+"""
 import logging
 import time
 import numpy as np
 from pydub import AudioSegment
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Try faster-whisper first, fallback to openai-whisper
-_use_faster_whisper = False
+# ── Backend selection (done once at import time) ───────────────────────────────
 try:
-    from faster_whisper import WhisperModel
-    _use_faster_whisper = True
-    logger.info("Using faster-whisper backend")
+    from faster_whisper import WhisperModel as _FasterWhisperModel
+    _USE_FASTER = True
+    logger.info("Transcription backend: faster-whisper")
 except ImportError:
-    logger.warning("faster-whisper not available, falling back to openai-whisper")
-    import whisper as openai_whisper
-    _use_faster_whisper = False
+    import whisper as _openai_whisper
+    _USE_FASTER = False
+    logger.info("Transcription backend: openai-whisper (faster-whisper not installed)")
 
-# Optional Streamlit caching
-try:
-    import streamlit as st
-    _have_streamlit = True
-except Exception:
-    _have_streamlit = False
-
-# Module-level cache
-_whisper_model = None
+# ── Model cache ────────────────────────────────────────────────────────────────
+# If Streamlit is available the model is cached at the app level via
+# @st.cache_resource in app.py; here we keep a simple module-level cache
+# for non-Streamlit usage (e.g. CLI / tests).
+_cached_model = None
 
 
-def _load_faster_whisper():
-    logger.info("Loading faster-whisper model: medium (device=cpu, compute_type=int8)")
-    start = time.time()
-    model = WhisperModel("medium", device="cpu", compute_type="int8")
-    elapsed = time.time() - start
-    logger.info(f"Faster-Whisper model loaded in {elapsed:.2f}s")
-    return model
+def _load_model():
+    """Load and return the appropriate Whisper model (cached after first call)."""
+    global _cached_model
+    if _cached_model is not None:
+        return _cached_model
+
+    t0 = time.time()
+    if _USE_FASTER:
+        logger.info("Loading faster-whisper 'medium' (cpu / int8)…")
+        _cached_model = _FasterWhisperModel("medium", device="cpu", compute_type="int8")
+    else:
+        logger.info("Loading openai-whisper 'medium'…")
+        _cached_model = _openai_whisper.load_model("medium")
+
+    logger.info("Model loaded in %.2fs", time.time() - t0)
+    return _cached_model
 
 
-def _load_openai_whisper():
-    logger.info("Loading openai-whisper model: medium")
-    start = time.time()
-    model = openai_whisper.load_model("medium")
-    elapsed = time.time() - start
-    logger.info(f"OpenAI Whisper model loaded in {elapsed:.2f}s")
-    return model
+# ── Public API ─────────────────────────────────────────────────────────────────
 
-
-if _have_streamlit:
-    @st.cache_resource
-    def _get_whisper_model():
-        if _use_faster_whisper:
-            return _load_faster_whisper()
-        else:
-            return _load_openai_whisper()
-else:
-    def _get_whisper_model():
-        global _whisper_model
-        if _whisper_model is None:
-            if _use_faster_whisper:
-                _whisper_model = _load_faster_whisper()
-            else:
-                _whisper_model = _load_openai_whisper()
-        else:
-            logger.info("Using cached model")
-        return _whisper_model
-
-
-def transcribe_segments(
-    wav_file: str,
-    diarized_segments: list[dict]
-) -> list[dict]:
+def transcribe_segments(wav_file: str, diarized_segments: list[dict]) -> list[dict]:
     """
-    Transcribes each diarized speaker segment into English text.
-    Uses faster-whisper if available, otherwise falls back to openai-whisper.
+    Transcribe each diarised speaker segment into English.
+
+    Args:
+        wav_file:          Path to the source WAV file.
+        diarized_segments: List of {start, end, speaker} dicts from diarize_audio().
+
+    Returns:
+        List of {start, end, speaker, text} dicts sorted by start time.
     """
-    start_time = time.time()
-    logger.info(f"Starting transcription for: {wav_file} with {len(diarized_segments)} segments")
-    logger.info(f"Backend: {'faster-whisper' if _use_faster_whisper else 'openai-whisper'}")
+    t0 = time.time()
+    logger.info("Transcribing %d segments from %s", len(diarized_segments), wav_file)
 
-    # Load the full WAV audio file once and normalize format
-    audio = AudioSegment.from_wav(wav_file)
-    audio = audio.set_channels(1).set_frame_rate(16000)
+    audio = AudioSegment.from_wav(wav_file).set_channels(1).set_frame_rate(16_000)
+    model = _load_model()
+    results = []
 
-    model = _get_whisper_model()
-    final_transcript = []
+    for i, seg in enumerate(diarized_segments):
+        chunk    = audio[int(seg["start"] * 1000) : int(seg["end"] * 1000)]
+        samples  = np.array(chunk.get_array_of_samples())
+        audio_np = samples.astype(np.float32) / float(2 ** (8 * chunk.sample_width - 1))
 
-    for i, segment in enumerate(diarized_segments):
-        seg_start_time = time.time()
-
-        # Convert times to milliseconds and extract chunk
-        start_ms = int(segment["start"] * 1000)
-        end_ms = int(segment["end"] * 1000)
-        chunk = audio[start_ms:end_ms]
-
-        # Convert to numpy float32 (-1.0 .. 1.0)
-        samples = np.array(chunk.get_array_of_samples())
-        sample_width = chunk.sample_width
-        max_val = float(2 ** (8 * sample_width - 1))
-        audio_np = samples.astype(np.float32) / max_val
-
-        # Transcribe based on backend
-        if _use_faster_whisper:
-            # faster-whisper returns (segments_iter, info)
-            segments_iter, info = model.transcribe(
-                audio_np,
-                beam_size=5,
-                language="en",
-                task="translate"
-            )
-            chunk_text = "".join([s.text for s in segments_iter]).strip()
+        if _USE_FASTER:
+            segs_iter, _ = model.transcribe(audio_np, beam_size=5, language="en", task="translate")
+            text = "".join(s.text for s in segs_iter).strip()
         else:
-            # openai-whisper returns dict with "text" key
-            result = model.transcribe(
-                audio_np,
-                language="en",
-                task="translate"
-            )
-            chunk_text = result["text"].strip()
+            text = model.transcribe(audio_np, language="en", task="translate")["text"].strip()
 
-        final_transcript.append({
-            "start": segment["start"],
-            "end": segment["end"],
-            "speaker": segment["speaker"],
-            "text": chunk_text,
+        results.append({
+            "start":   seg["start"],
+            "end":     seg["end"],
+            "speaker": seg["speaker"],
+            "text":    text,
         })
+        logger.debug("Segment %d/%d done", i + 1, len(diarized_segments))
 
-        seg_elapsed = time.time() - seg_start_time
-        logger.info(f"Segment {i+1}/{len(diarized_segments)} ({segment['speaker']}) transcribed in {seg_elapsed:.2f}s")
-
-    final_transcript.sort(key=lambda x: x["start"])
-    elapsed = time.time() - start_time
-    logger.info(f"Transcription completed in {elapsed:.2f}s. Total text segments: {len(final_transcript)}")
-    return final_transcript
+    results.sort(key=lambda x: x["start"])
+    logger.info("Transcription completed in %.2fs (%d segments)", time.time() - t0, len(results))
+    return results
 
 
 def transcribe_file(wav_file: str) -> str:
     """
-    Transcribe a whole WAV file and return the plain text (English).
-    Uses faster-whisper when available, otherwise openai-whisper.
+    Transcribe an entire WAV file and return plain English text.
+
+    Args:
+        wav_file: Path to the WAV file.
+
+    Returns:
+        Transcribed text string.
     """
-    logger.info(f"Transcribing full file: {wav_file}")
-    model = _get_whisper_model()
+    logger.info("Transcribing full file: %s", wav_file)
+    model = _load_model()
 
-    if _use_faster_whisper:
-        segments, info = model.transcribe(
-            wav_file,
-            beam_size=5,
-            language="en",
-            task="translate"
-        )
-        text = "".join([s.text for s in segments]).strip()
+    if _USE_FASTER:
+        segs, _ = model.transcribe(wav_file, beam_size=5, language="en", task="translate")
+        return "".join(s.text for s in segs).strip()
     else:
-        result = model.transcribe(
-            wav_file,
-            language="en",
-            task="translate"
-        )
-        text = result.get("text", "").strip()
-
-    logger.info(f"Transcription length: {len(text)} chars")
-    return text
+        return model.transcribe(wav_file, language="en", task="translate").get("text", "").strip()
